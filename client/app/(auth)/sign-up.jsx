@@ -1,38 +1,43 @@
-import { View, Image, Text, ScrollView, Alert } from 'react-native';
-import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import FormField from '../../components/FormField';
-import CustomButton from '../../components/CustomButton';
-import { images } from '../../constants';
-import { Link, router } from 'expo-router';
-import { createUser } from '../../lib/appwrite';
-import { useGlobalContext } from '../../context/GlobalProvider';
+import { View, Image, Text, ScrollView, Alert } from "react-native";
+import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import FormField from "../../components/FormField";
+import CustomButton from "../../components/CustomButton";
+import { images } from "../../constants";
+import { Link, router } from "expo-router";
+import axios from "axios";
 
 const SignUp = () => {
-  const [form, setForm] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
+  // States
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setUser, setIsLoggedIn } = useGlobalContext();
-
-  const submit = async () => {
-    if (form.username === "" || form.email === "" || form.password === "") {
-      Alert.alert('Error', 'Please fill in all the fields');
-      return;
-    }
-    setIsSubmitting(true);
+  // Function to handle form submission
+  const handleSubmit = async () => {
     try {
-      const result = await createUser(form.email, form.password, form.username);
-      setUser(result);
-      setIsLoggedIn(true);
-      router.replace('/home');
+      setLoading(true);
+      if (!name || !email || !password) {
+        Alert.alert("Please Fill All Fields");
+        setLoading(false);
+        return;
+      }
+      const { data } = await axios.post(
+        "http://192.168.1.63:8000/api/v1/auth/register",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+      Alert.alert(data && data.message);
+      router.replace("sign-in"); // Navigate to the sign-in page
+      console.log("Register Data==> ", { name, email, password });
     } catch (error) {
-      Alert.alert('Error', error.message);
-    } finally {
-      setIsSubmitting(false);
+      Alert.alert(error.response?.data?.message || "An error occurred");
+      setLoading(false);
+      console.log(error);
     }
   };
 
@@ -40,40 +45,51 @@ const SignUp = () => {
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
         <View className="w-full justify-center min-h-[85vh] px-4 my-6">
-          <Image source={images.logo} resizeMode='contain' className="w-[115px] h-[35px]" />
-          <Text className="text-2xl text-white mt-10 font-psemibold">Sign up to Aora</Text>
+          <Image
+            source={images.logo}
+            resizeMode="contain"
+            className="w-[115px] h-[35px]"
+          />
+          <Text className="text-2xl text-white mt-10 font-psemibold">
+            Sign up to Aora
+          </Text>
 
           <FormField
             title="Username"
-            value={form.username}
-            handleChangeText={(e) => setForm({ ...form, username: e })}
+            value={name}
+            handleChangeText={(e) => setName(e)}
             otherStyles="mt-7"
           />
 
           <FormField
             title="Email"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            value={email}
+            handleChangeText={(e) => setEmail(e)}
             otherStyles="mt-7"
             keyboardType="email-address"
           />
 
           <FormField
             title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
+            value={password}
+            handleChangeText={(e) => setPassword(e)}
             otherStyles="mt-7"
           />
 
           <CustomButton
             title="Sign Up"
-            handlePress={submit}
+            handlePress={handleSubmit}
             containerStyles="mt-7"
-            isLoading={isSubmitting}
+            isLoading={loading}
           />
+
           <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-gray-100 font-pregular"> Have an account?</Text>
-            <Link href="/sign-in" className="font-semibold text-secondary">Sign In</Link>
+            <Text className="text-gray-100 font-pregular">
+              Have an account?
+            </Text>
+            <Link href="/sign-in" className="font-semibold text-secondary">
+              Sign In
+            </Link>
           </View>
         </View>
       </ScrollView>

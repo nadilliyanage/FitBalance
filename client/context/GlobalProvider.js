@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getCurrentUser } from "../lib/appwrite";
+import axios from "axios";
 
 const GlobalContext = createContext({
   isLoggedIn: false,
@@ -19,16 +19,21 @@ const GlobalProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await getCurrentUser();
-        if (res) {
+        const res = await axios.get("http://localhost:8000/api/v1/auth/me", {
+          withCredentials: true, // Ensure cookies are sent with the request if needed
+        });
+
+        if (res.data) {
           setIsLoggedIn(true);
-          setUser(res);
+          setUser(res.data.user); // Assuming your API response has a `user` field
         } else {
           setIsLoggedIn(false);
           setUser(null);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
+        setIsLoggedIn(false);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
