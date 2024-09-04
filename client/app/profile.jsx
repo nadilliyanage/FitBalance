@@ -1,39 +1,59 @@
-import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { icons } from "../constants";
-import { signOut } from "../lib/appwrite";
-import { router } from "expo-router";
-import { useGlobalContext } from "../context/GlobalProvider";
+import axios from "axios";
+import { useRouter } from "expo-router"; // useRouter for expo-router
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
-  const { setUser, setIsLoggedIn } = useGlobalContext();
+  const router = useRouter(); // useRouter hook
 
   const logout = async () => {
     try {
-      await signOut();
-      setUser(null);
-      setIsLoggedIn(false);
-      router.replace("/sign-in");
+      // Replace with your backend URL for logout
+      await axios.post("http://192.168.1.63:8000/api/v1/auth/logout");
+
+      // Remove token from AsyncStorage
+      await AsyncStorage.removeItem("userToken");
+
+      // Navigate to SignIn screen
+      router.push("/sign-in"); // Adjust the path based on your router setup
     } catch (error) {
       console.error("Logout failed:", error);
     }
   };
 
   return (
-    <View className="w-full justify-center items-center mt-6 mb-12 px-4">
-      <TouchableOpacity
-        className="w-full items-end mb-10 mt-10"
-        onPress={logout}
-      >
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
         <Image
           source={icons.logout}
           resizeMode="contain"
-          className="w-6 h-6"
-          style={{ tintColor: "red" }}
+          style={styles.logoutIcon}
         />
       </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  logoutButton: {
+    alignSelf: "flex-end",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  logoutIcon: {
+    width: 24,
+    height: 24,
+    tintColor: "red",
+  },
+});
 
 export default Profile;
