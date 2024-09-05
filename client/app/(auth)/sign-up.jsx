@@ -23,14 +23,11 @@ const SignUp = () => {
         setLoading(false);
         return;
       }
-      const { data } = await axios.post(
-        "http://192.168.1.63:8000/api/v1/auth/register",
-        {
-          name,
-          email,
-          password,
-        }
-      );
+      const { data } = await axios.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
       Alert.alert(data && data.message);
       router.replace("sign-in"); // Navigate to the sign-in page
       console.log("Register Data==> ", { name, email, password });

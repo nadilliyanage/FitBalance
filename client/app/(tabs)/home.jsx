@@ -1,11 +1,15 @@
 import { View, Image, Text, TouchableOpacity, FlatList } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { icons } from "../../constants";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchInput from "../../components/SearchInput";
+import { AuthContext } from "../../context/authContext";
 
 const Home = () => {
+  //global state
+  const [state] = useContext(AuthContext);
+
   const router = useRouter();
 
   const handleProfileNavigation = () => {
@@ -31,7 +35,7 @@ const Home = () => {
               Welcome Back
             </Text>
             <Text className="text-2xl font-psemibold text-white">
-              Nadil Liyanage
+              {state?.user?.name || "Guest"}
             </Text>
           </View>
         </View>
