@@ -16,10 +16,10 @@ const SearchInput = ({
   return (
     <View
       className="border-2 border-black-200 w-full h-16 px-4 
-      bg-black-100 rounded-2xl focus:border-secondary items-center flex-row space-x-4"
+      bg-primary rounded-2xl focus:border-secondary-200 items-center flex-row space-x-4"
     >
       <TextInput
-        className="text-base my-0.5 text-white flex-1 font-pregular"
+        className="text-base my-0.5 text-black flex-1 font-pregular"
         value={value}
         placeholder="Type to search"
         placeholderTextColor="#7b7b8b"
