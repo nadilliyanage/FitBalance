@@ -8,6 +8,7 @@ import { images } from "../../constants";
 import { Link, router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Toast from "react-native-toast-message";
 
 const SignIn = () => {
   //global state
@@ -36,7 +37,11 @@ const SignIn = () => {
 
   const submit = async () => {
     if (form.email === "" || form.password === "") {
-      Alert.alert("Error", "Please fill in all the fields");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Please fill in all the fields",
+      });
       return;
     }
 
@@ -64,16 +69,30 @@ const SignIn = () => {
         await AsyncStorage.setItem("@auth", JSON.stringify({ user, token }));
 
         // Navigate to the home screen
-        Alert.alert("Success", "User signed in successfully");
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Signed in successfully",
+        });
         router.replace("/home");
       } else {
-        Alert.alert("Error", data.message);
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Signed in successfully",
+        });
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: data.message,
+        });
       }
     } catch (error) {
-      Alert.alert(
-        "Error",
-        error.response?.data?.message || "Something went wrong"
-      );
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error.response?.data?.message || "Something went wrong",
+      });
     } finally {
       setIsSubmitting(false);
     }
