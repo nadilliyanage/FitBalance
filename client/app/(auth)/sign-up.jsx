@@ -6,6 +6,7 @@ import CustomButton from "../../components/CustomButton";
 import { images } from "../../constants";
 import { Link, router } from "expo-router";
 import axios from "axios";
+import Toast from "react-native-toast-message";
 
 const SignUp = () => {
   // States
@@ -19,7 +20,12 @@ const SignUp = () => {
     try {
       setLoading(true);
       if (!name || !email || !password) {
-        Alert.alert("Please Fill All Fields");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Please Fill All Field",
+        });
+
         setLoading(false);
         return;
       }
@@ -28,11 +34,21 @@ const SignUp = () => {
         email,
         password,
       });
-      Alert.alert(data && data.message);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "data && data.message",
+      });
+
       router.replace("sign-in"); // Navigate to the sign-in page
       console.log("Register Data==> ", { name, email, password });
     } catch (error) {
-      Alert.alert(error.response?.data?.message || "An error occurred");
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error.response?.data?.message || "An error occurred",
+      });
+
       setLoading(false);
       console.log(error);
     }

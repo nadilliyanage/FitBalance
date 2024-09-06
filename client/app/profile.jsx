@@ -4,6 +4,7 @@ import { icons } from "../constants";
 import axios from "axios";
 import { useRouter } from "expo-router"; // useRouter for expo-router
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const Profile = () => {
   const router = useRouter(); // useRouter hook
@@ -16,9 +17,20 @@ const Profile = () => {
       // Remove token from AsyncStorage
       await AsyncStorage.removeItem("userToken");
 
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Logout successfully",
+      });
+
       // Navigate to SignIn screen
       router.push("/sign-in"); // Adjust the path based on your router setup
     } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Logout failed",
+      });
       console.error("Logout failed:", error);
     }
   };
