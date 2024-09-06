@@ -17,7 +17,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView className="bg-primary rounded-b-3xl">
+    <SafeAreaView className="bg-secondary-100 rounded-b-3xl">
       <View className="my-6 px-4 space-y-6">
         <View className="justify-between items-start flex-row mb-6">
           <TouchableOpacity
@@ -27,7 +27,7 @@ const Home = () => {
             <Image
               source={icons.profile}
               resizeMode="contain"
-              style={{ width: 24, height: 24, tintColor: "green" }}
+              style={{ width: 24, height: 24, tintColor: "purple" }}
             />
           </TouchableOpacity>
           <View>

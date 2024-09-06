@@ -10,39 +10,34 @@ export default function Index() {
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
         <View className="w-full justify-center items-center min-h-[85vh] px-4">
-          <Image
-            source={images.logo}
-            className="w-[130px] h-[84px]"
-            resizeMode="contain"
-          />
+          <View className="relative mt-6">
+            <Text className="text-5xl text-black font-bold text-center">
+              FitBalance<Text className="text-secondary-200">360</Text>
+            </Text>
+          </View>
 
           <Image
-            source={images.cards}
+            source={images.logo}
             className="max-w-[380] w-full h-[300px]"
             resizeMode="contain"
           />
 
           <View className="relative mt-5">
-            <Text className="text-3xl text-white font-bold text-center">
+            <Text className="text-3xl text-black font-bold text-center">
               {" "}
-              Discover Endless Possibilities with{" "}
-              <Text className="text-secondary-200">Aora</Text>
+              Unlock Your Full Potential with{" "}
+              <Text className="text-secondary-200">FitBalance360</Text>
             </Text>
-            <Image
-              source={images.path}
-              className="w-[136px] h-[15px] absolute -bottom-2 -right-8"
-              resizeMode="contain"
-            />
           </View>
-          <Text className="text-sm text-gray-100 mt-7 font-pregular text-center">
-            Where creativity meets innovation: embark on a journey of limitless
-            exploration with Aora
+          <Text className="text-sm text-gray-500 mt-7 font-pregular text-center">
+            Elevate your fitness journey with FitBalance360 – Your all-in-one
+            guide to a healthier, stronger you!
           </Text>
 
           <CustomButton
             title="Continue with Email"
             handlePress={() => router.push("/sign-in")}
-            containerStyles="w-full mt-7"
+            containerStyles="w-full mt-7 "
           />
         </View>
       </ScrollView>
