@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
   });
 
   // Set default base URL for axios
+
   axios.defaults.baseURL = "http://192.168.1.106:8000/api/v1";
 
   // Load authentication data from local storage on component mount
