@@ -1,12 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, TextInput } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons'; // For the gender icons and increment/decrement buttons
-import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window'); // Get the device's width
 
 const BMICalculator = () => {
-  const navigation = useNavigation(); // Hook for navigation
   const [gender, setGender] = useState('male');
   const [weight, setWeight] = useState('65');
   const [age, setAge] = useState('26');
@@ -23,13 +21,8 @@ const BMICalculator = () => {
 
   return (
     <View className="flex-1 p-5 bg-white mt-10">
-      {/* Header with Back Button */}
-      <View className="flex-row items-center mb-5">
-        <TouchableOpacity onPress={() => navigation.navigate('Exercises')} className="p-2">
-          <FontAwesome5 name="arrow-left" size={24} color="black" />
-        </TouchableOpacity>
-        <Text className="text-xl font-bold text-center flex-1">BMI Calculator</Text>
-      </View>
+      {/* Header */}
+      <Text className="text-xl font-bold mb-5 text-center">BMI Calculator</Text>
 
       {/* Gender Selection */}
       <Text className="text-lg font-semibold mb-3">Please choose your gender</Text>
@@ -112,7 +105,6 @@ const BMICalculator = () => {
           value={height}
           onChangeText={text => setHeight(text)}
         />
-        <Text className="text-3xl font-bold mb-3">{height}</Text>
 
         {/* Scrollable Ruler */}
         <ScrollView

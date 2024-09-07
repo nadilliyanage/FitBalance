@@ -12,9 +12,6 @@ const Exercises = () => {
 
   return (
     <View className="flex-1 items-center pt-10">
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack>
       <CustomButton
         title="Calculate BMI"
         handlePress={() => setShowBMICalculator(true)}
