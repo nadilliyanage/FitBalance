@@ -9,6 +9,10 @@ import { Link, router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Toast from "react-native-toast-message";
+import { API_BASE_URL } from "@env";
+
+// Set the base URL for axios
+axios.defaults.baseURL = API_BASE_URL;
 
 const SignIn = () => {
   //global state
@@ -76,11 +80,6 @@ const SignIn = () => {
         });
         router.replace("/home");
       } else {
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Signed in successfully",
-        });
         Toast.show({
           type: "error",
           text1: "Error",
