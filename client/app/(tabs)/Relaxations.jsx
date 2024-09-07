@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "../../components/CustomButton";
-import DailyStressQuiz from "../../components/DailyStressQuiz";
+import DailyStressQuiz from "../pages/Relaxations/DailyStressQuiz";
 
 const Relaxations = () => {
   const [showQuiz, setShowQuiz] = useState(false);
