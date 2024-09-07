@@ -12,7 +12,7 @@ const Profile = () => {
   const logout = async () => {
     try {
       // Replace with your backend URL for logout
-      await axios.post("http://192.168.1.63:8000/api/v1/auth/logout");
+      await axios.post("/auth/logout");
 
       // Remove token from AsyncStorage
       await AsyncStorage.removeItem("userToken");
