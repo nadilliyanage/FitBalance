@@ -1,4 +1,4 @@
-import { View, Image, Text, ScrollView, Alert } from "react-native";
+import { View, Image, Text, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
@@ -7,6 +7,7 @@ import { images } from "../../constants";
 import { Link, router } from "expo-router";
 import axios from "axios";
 import Toast from "react-native-toast-message";
+import { API_BASE_URL } from "@env";
 
 const SignUp = () => {
   // States
@@ -23,25 +24,28 @@ const SignUp = () => {
         Toast.show({
           type: "error",
           text1: "Error",
-          text2: "Please Fill All Field",
+          text2: "Please fill all fields",
         });
 
         setLoading(false);
         return;
       }
-      const { data } = await axios.post("/auth/register", {
+
+      // Use the API_BASE_URL for the axios request
+      const { data } = await axios.post(`${API_BASE_URL}/auth/register`, {
         name,
         email,
         password,
       });
+
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: "data && data.message",
+        text2: data && data.message,
       });
 
-      router.replace("sign-in"); // Navigate to the sign-in page
-      console.log("Register Data==> ", { name, email, password });
+      router.replace("/sign-in"); // Navigate to the sign-in page
+      console.log("Register Data==>", { name, email, password });
     } catch (error) {
       Toast.show({
         type: "error",
@@ -49,8 +53,9 @@ const SignUp = () => {
         text2: error.response?.data?.message || "An error occurred",
       });
 
-      setLoading(false);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,6 +94,7 @@ const SignUp = () => {
             value={password}
             handleChangeText={(e) => setPassword(e)}
             otherStyles="mt-7"
+            secureTextEntry
           />
 
           <CustomButton
