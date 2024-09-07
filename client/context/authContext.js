@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 // Create AuthContext
 const AuthContext = createContext();
@@ -14,7 +15,7 @@ const AuthProvider = ({ children }) => {
   });
 
   // Set default base URL for axios
-  axios.defaults.baseURL = "http://192.168.1.105:8000/api/v1";
+  axios.defaults.baseURL = API_BASE_URL; // Use the environment variable
 
   // Load authentication data from local storage on component mount
   useEffect(() => {
