@@ -2,17 +2,21 @@ import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { icons } from "../constants";
 import axios from "axios";
-import { useRouter } from "expo-router"; // useRouter for expo-router
+import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { API_BASE_URL } from "@env";
+
+// Set the base URL for axios globally
+axios.defaults.baseURL = API_BASE_URL;
 
 const Profile = () => {
-  const router = useRouter(); // useRouter hook
+  const router = useRouter();
 
   const logout = async () => {
     try {
-      // Replace with your backend URL for logout
-      await axios.post("http://192.168.1.63:8000/api/v1/auth/logout");
+      // Call your backend's logout endpoint
+      await axios.post("/auth/logout");
 
       // Remove token from AsyncStorage
       await AsyncStorage.removeItem("userToken");
@@ -24,7 +28,7 @@ const Profile = () => {
       });
 
       // Navigate to SignIn screen
-      router.push("/sign-in"); // Adjust the path based on your router setup
+      router.push("/sign-in");
     } catch (error) {
       Toast.show({
         type: "error",
