@@ -7,7 +7,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { API_BASE_URL } from "@env";
 
-// Set the base URL for axios globally
 axios.defaults.baseURL = API_BASE_URL;
 
 const Profile = () => {
@@ -15,27 +14,23 @@ const Profile = () => {
 
   const logout = async () => {
     try {
-      // Call your backend's logout endpoint
       await axios.post("/auth/logout");
-
-      // Remove token from AsyncStorage
-      await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("@auth");
 
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: "Logout successfully",
+        text2: "Logged out successfully",
       });
 
-      // Navigate to SignIn screen
       router.push("/sign-in");
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "Logout failed",
+        text2: error.response?.data?.message || "Logout failed",
       });
-      console.error("Logout failed:", error);
+      console.error("Logout Error:", error.response?.data || error.message);
     }
   };
 
