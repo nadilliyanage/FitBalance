@@ -1,43 +1,26 @@
-import { View, Image, Text, ScrollView, Alert } from "react-native";
-import React, { useState, useEffect, useContext } from "react";
+import { View, Image, Text, ScrollView } from "react-native";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
 import { images } from "../../constants";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import { API_BASE_URL } from "@env";
 
-// Set the base URL for axios
 axios.defaults.baseURL = API_BASE_URL;
 
 const SignIn = () => {
-  //global state
   const [state, setState] = useContext(AuthContext);
-
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Fetch and log AsyncStorage data on component mount
-  useEffect(() => {
-    const getLocalStorageData = async () => {
-      try {
-        const data = await AsyncStorage.getItem("@auth");
-        console.log("Local Storage Data =>", data);
-      } catch (error) {
-        console.error("Error fetching local storage data:", error);
-      }
-    };
-
-    getLocalStorageData();
-  }, []); // Empty dependency array means it will run once when the component is mounted
+  const router = useRouter();
 
   const submit = async () => {
     if (form.email === "" || form.password === "") {
@@ -49,30 +32,21 @@ const SignIn = () => {
       return;
     }
 
-    // Log the email and password values
-    console.log("Email:", form.email);
-    console.log("Password:", form.password);
-
     setIsSubmitting(true);
 
     try {
-      // Make a POST request to your backend to authenticate the user
       const { data } = await axios.post("/auth/login", {
         email: form.email,
         password: form.password,
       });
 
-      // If successful, save the user data locally or in a global state
       if (data.success) {
         const user = data.user;
         const token = data.token;
 
-        setState(data);
-
-        // Save the token and user data to AsyncStorage
+        setState({ user, token });
         await AsyncStorage.setItem("@auth", JSON.stringify({ user, token }));
 
-        // Navigate to the home screen
         Toast.show({
           type: "success",
           text1: "Success",
@@ -83,7 +57,7 @@ const SignIn = () => {
         Toast.show({
           type: "error",
           text1: "Error",
-          text2: data.message,
+          text2: data.message || "An error occurred",
         });
       }
     } catch (error) {
@@ -92,6 +66,7 @@ const SignIn = () => {
         text1: "Error",
         text2: error.response?.data?.message || "Something went wrong",
       });
+      console.error("SignIn Error:", error.response?.data || error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -105,7 +80,7 @@ const SignIn = () => {
             <Image
               source={images.logo}
               resizeMode="contain"
-              className="w-[250px] h-[250px]"
+              className="w-[200px] h-[200px]"
             />
           </View>
           <Text className="text-3xl text-black mt-5 font-psemibold">
@@ -134,12 +109,12 @@ const SignIn = () => {
             containerStyles="mt-7"
             isLoading={isSubmitting}
           />
+
           <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-gray-500 font-pregular">
-              {" "}
+            <Text className="text-gray-500 font-normal">
               Don't have an account?
             </Text>
-            <Link href="/sign-up" className="font-semibold text-secondary">
+            <Link href="/sign-up" className="font text-secondary">
               Sign Up
             </Link>
           </View>
