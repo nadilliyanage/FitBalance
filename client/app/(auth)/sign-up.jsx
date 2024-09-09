@@ -4,12 +4,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
 import { images } from "../../constants";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import { API_BASE_URL } from "@env";
 
+// Set the base URL for axios globally
+axios.defaults.baseURL = API_BASE_URL;
+
 const SignUp = () => {
+  const router = useRouter();
+
   // States
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,19 +25,19 @@ const SignUp = () => {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
       if (!name || !email || !password) {
         Toast.show({
           type: "error",
           text1: "Error",
           text2: "Please fill all fields",
         });
-
         setLoading(false);
         return;
       }
 
-      // Use the API_BASE_URL for the axios request
-      const { data } = await axios.post(`${API_BASE_URL}/auth/register`, {
+      // API request to register a new user
+      const { data } = await axios.post("/auth/register", {
         name,
         email,
         password,
@@ -45,15 +50,13 @@ const SignUp = () => {
       });
 
       router.replace("/sign-in"); // Navigate to the sign-in page
-      console.log("Register Data==>", { name, email, password });
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Error",
         text2: error.response?.data?.message || "An error occurred",
       });
-
-      console.log(error);
+      console.error("Sign-up Error:", error);
     } finally {
       setLoading(false);
     }
@@ -62,12 +65,12 @@ const SignUp = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
-        <View className="w-full justify-center min-h-[85vh] px-4 ">
+        <View className="w-full justify-center min-h-[85vh] px-4">
           <View className="items-center">
             <Image
               source={images.logo}
               resizeMode="contain"
-              className="w-[250px] h-[250px]"
+              className="w-[200px] h-[200px]"
             />
           </View>
           <Text className="text-3xl text-black mt-1 font-psemibold">
