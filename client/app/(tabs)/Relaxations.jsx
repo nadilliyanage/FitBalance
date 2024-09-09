@@ -18,7 +18,7 @@ const Relaxations = () => {
           <CustomButton
             title="Go to Daily Quiz"
             handlePress={() => setShowQuiz(true)} // Set to show the quiz
-            containerStyles="w-full mt-20"
+            containerStyles="w-full "
           />
         </View>
       </ScrollView>
