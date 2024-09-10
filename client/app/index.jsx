@@ -1,11 +1,29 @@
 import { StatusBar } from "expo-status-bar";
 import { ScrollView, Text, View, Image } from "react-native";
+import { useContext, useEffect } from "react";
 import { Redirect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../constants";
 import CustomButton from "../components/CustomButton";
+import { AuthContext } from "../context/authContext";
 
 export default function Index() {
+  const [authState] = useContext(AuthContext);
+
+  useEffect(() => {
+    if (authState.user && authState.token) {
+      router.push("/home"); // Redirect to home if user is logged in
+    }
+  }, [authState]);
+
+  const handlePress = () => {
+    if (authState.user && authState.token) {
+      router.push("/home"); // Redirect to home if user is logged in
+    } else {
+      router.push("/sign-in"); // Redirect to sign-in if user is not logged in
+    }
+  };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: "100%" }}>
@@ -36,7 +54,7 @@ export default function Index() {
 
           <CustomButton
             title="Continue with Email"
-            handlePress={() => router.push("/sign-in")}
+            handlePress={handlePress}
             containerStyles="w-full mt-7 "
           />
         </View>
