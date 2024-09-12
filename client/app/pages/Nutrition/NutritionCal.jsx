@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { View, Text, TextInput, Button, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -62,17 +62,18 @@ const NutritionCalculator = () => {
   const getLackingNutrients = (totalNutrition) => {
     const lackingNutrients = [];
     if (totalNutrition.calories < DAILY_NUTRIENT_REQUIREMENTS.calories)
-      lackingNutrients.push(`Calories: ${DAILY_NUTRIENT_REQUIREMENTS.calories - totalNutrition.calories}`);
+      lackingNutrients.push({ name: 'Calories', value: DAILY_NUTRIENT_REQUIREMENTS.calories - totalNutrition.calories });
     if (totalNutrition.protein < DAILY_NUTRIENT_REQUIREMENTS.protein)
-      lackingNutrients.push(`Protein: ${DAILY_NUTRIENT_REQUIREMENTS.protein - totalNutrition.protein}`);
+      lackingNutrients.push({ name: 'Protein', value: DAILY_NUTRIENT_REQUIREMENTS.protein - totalNutrition.protein });
     if (totalNutrition.carbs < DAILY_NUTRIENT_REQUIREMENTS.carbs)
-      lackingNutrients.push(`Carbs: ${DAILY_NUTRIENT_REQUIREMENTS.carbs - totalNutrition.carbs}`);
+      lackingNutrients.push({ name: 'Carbs', value: DAILY_NUTRIENT_REQUIREMENTS.carbs - totalNutrition.carbs });
     if (totalNutrition.fat < DAILY_NUTRIENT_REQUIREMENTS.fat)
-      lackingNutrients.push(`Fat: ${DAILY_NUTRIENT_REQUIREMENTS.fat - totalNutrition.fat}`);
-    return lackingNutrients.length > 0 ? lackingNutrients.join(', ') : 'None';
+      lackingNutrients.push({ name: 'Fat', value: DAILY_NUTRIENT_REQUIREMENTS.fat - totalNutrition.fat });
+    return lackingNutrients;
   };
 
   const totalNutrition = calculateTotalNutrition();
+  const lackingNutrients = getLackingNutrients(totalNutrition);
 
   if (back) {
     return (
@@ -161,13 +162,47 @@ const NutritionCalculator = () => {
         {/* Nutritional Summary */}
         <View className="bg-white shadow-md rounded p-4 mt-4">
           <Text className="text-xl font-bold text-gray-800">Nutritional Summary:</Text>
-          <Text className="text-lg text-gray-600">Total Calories: {totalNutrition.calories.toFixed(2)}</Text>
-          <Text className="text-lg text-gray-600">Total Protein: {totalNutrition.protein.toFixed(2)}g</Text>
-          <Text className="text-lg text-gray-600">Total Carbs: {totalNutrition.carbs.toFixed(2)}g</Text>
-          <Text className="text-lg text-gray-600">Total Fat: {totalNutrition.fat.toFixed(2)}g</Text>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-lg text-gray-600">Calories:</Text>
+            <Text className={`text-lg font-bold ${totalNutrition.calories >= DAILY_NUTRIENT_REQUIREMENTS.calories ? 'text-green-600' : 'text-red-600'}`}>
+              {totalNutrition.calories.toFixed(2)} / {DAILY_NUTRIENT_REQUIREMENTS.calories}
+            </Text>
+          </View>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-lg text-gray-600">Protein:</Text>
+            <Text className={`text-lg font-bold ${totalNutrition.protein >= DAILY_NUTRIENT_REQUIREMENTS.protein ? 'text-green-600' : 'text-red-600'}`}>
+              {totalNutrition.protein.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.protein}g
+            </Text>
+          </View>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-lg text-gray-600">Carbs:</Text>
+            <Text className={`text-lg font-bold ${totalNutrition.carbs >= DAILY_NUTRIENT_REQUIREMENTS.carbs ? 'text-green-600' : 'text-red-600'}`}>
+              {totalNutrition.carbs.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.carbs}g
+            </Text>
+          </View>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-lg text-gray-600">Fat:</Text>
+            <Text className={`text-lg font-bold ${totalNutrition.fat >= DAILY_NUTRIENT_REQUIREMENTS.fat ? 'text-green-600' : 'text-red-600'}`}>
+              {totalNutrition.fat.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.fat}g
+            </Text>
+          </View>
+        </View>
 
-          <Text className="text-lg font-bold text-gray-800 mt-4">Lacking Nutrients:</Text>
-          <Text className="text-lg text-gray-600">{getLackingNutrients(totalNutrition)}</Text>
+        {/* Lacking Nutrients as Summary */}
+        <View className="bg-yellow-100 shadow-md rounded p-4 mt-4">
+          <Text className="text-xl font-bold text-yellow-900">Lacking Nutrients:</Text>
+          {lackingNutrients.length > 0 ? (
+            <View>
+              {lackingNutrients.map((nutrient, index) => (
+                <View key={index} className="flex-row justify-between items-center">
+                  <Text className="text-lg text-yellow-800">{nutrient.name}:</Text>
+                  <Text className="text-lg font-bold text-yellow-800">{nutrient.value.toFixed(2)}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text className="text-lg text-green-600">None</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

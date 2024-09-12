@@ -1,23 +1,28 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "../../components/CustomButton";
-import DailyStressQuiz from "../pages/Nutrition/NutritionCal";
+import NutritionCalculator from "../pages/Nutrition/NutritionCal";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const NutriCal = () => {
-  const [showQuiz, setShowQuiz] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
 
-  if (showQuiz) {
-    return <DailyStressQuiz />; // Display the quiz directly
+  if (showCalculator) {
+    return <NutritionCalculator />; // Display the nutrition calculator directly
   }
 
   return (
-    <View>
-      <CustomButton
-        title="Calculate Nutrition"
-        handlePress={() => setShowQuiz(true)} // Set to show the quiz
-        containerStyles="w-full mt-20"
-      />
-    </View>
+    <SafeAreaView className="bg-primary h-full">
+      <ScrollView>
+        <View className="w-full min-h-[85vh] px-4 my-6">
+          <CustomButton
+            title="Calculate Nutrition"
+            handlePress={() => setShowCalculator(true)} // Set to Nutrition Calculator
+            containerStyles="w-full"
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
