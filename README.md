@@ -8,6 +8,10 @@
 
    npm run dev
 
+   or
+
+   npm run dev --clear
+
 3. Start the server
 
    npm start

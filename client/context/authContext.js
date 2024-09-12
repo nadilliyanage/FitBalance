@@ -8,16 +8,13 @@ const AuthContext = createContext();
 
 // AuthProvider to manage global authentication state
 const AuthProvider = ({ children }) => {
-  // Global state for authentication
   const [state, setState] = useState({
     user: null,
     token: null,
   });
 
-  // Set default base URL for axios
-  axios.defaults.baseURL = API_BASE_URL; // Use the environment variable
+  axios.defaults.baseURL = API_BASE_URL;
 
-  // Load authentication data from local storage on component mount
   useEffect(() => {
     const loadLocalStorageData = async () => {
       try {
@@ -39,7 +36,6 @@ const AuthProvider = ({ children }) => {
     loadLocalStorageData();
   }, []);
 
-  // Automatically set authorization token in axios headers if it exists
   useEffect(() => {
     if (state.token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
