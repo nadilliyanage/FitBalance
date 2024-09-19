@@ -5,6 +5,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const LazyNutrition = lazy(() => import("../../(tabs)/Nutrition"));
+
 const HealthData = ({ navigation }) => {
   const [hemoglobinRange, setHemoglobinRange] = useState('');
   const [bloodSugarRange, setBloodSugarRange] = useState('');
@@ -12,6 +14,8 @@ const HealthData = ({ navigation }) => {
   const [hdlRange, setHdlRange] = useState('');
   const [ldlRange, setLdlRange] = useState('');
   const [triglyceridesRange, setTriglyceridesRange] = useState('');
+
+  const [back, setBack] = useState(false);
 
   const handleSubmit = () => {
     // Handle submission logic, validation, and navigation
@@ -24,6 +28,14 @@ const HealthData = ({ navigation }) => {
       triglyceridesRange
     });
   };
+
+  if (back) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <LazyNutrition />
+      </Suspense>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100 p-4">
