@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Picker, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useState, lazy, Suspense } from 'react';
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const HealthData = ({ navigation }) => {
   const [hemoglobinRange, setHemoglobinRange] = useState('');
@@ -23,7 +26,17 @@ const HealthData = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-100 p-4">
+      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
+         {/* Back Button */}
+         <TouchableOpacity
+          className="absolute top-10 left-4 z-10 p-2 bg-purple-200 rounded"
+          onPress={() => setBack(true)}
+        >
+          <Text className="text-lg font-bold text-purple-700">
+            Back to Nutrition
+          </Text>
+        </TouchableOpacity>
       <Text style={styles.title}>Health Data</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Hemoglobin Level (g/dL)</Text>
@@ -108,6 +121,7 @@ const HealthData = ({ navigation }) => {
         <Icon name="arrow-right" size={20} color="white" />
       </TouchableOpacity>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
