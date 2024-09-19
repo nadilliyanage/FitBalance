@@ -13,7 +13,7 @@ const Home = () => {
   const router = useRouter();
 
   const handleProfileNavigation = () => {
-    router.push("../profile");
+    router.replace("../pages/profile");
   };
 
   return (

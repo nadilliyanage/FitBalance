@@ -1,6 +1,6 @@
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import React from "react";
-import { icons } from "../constants";
+import { icons } from "../../constants";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,57 +14,49 @@ const Profile = () => {
 
   const logout = async () => {
     try {
+      // Perform the API logout request
       await axios.post("/auth/logout");
+
+      // Remove the authentication token from AsyncStorage
       await AsyncStorage.removeItem("@auth");
 
+      // Show success toast
       Toast.show({
         type: "success",
         text1: "Success",
         text2: "Logged out successfully",
       });
 
-      router.push("/sign-in");
+      // Navigate to the sign-in page
+      router.replace("/sign-in"); // replace prevents back navigation to profile
     } catch (error) {
+      // Show error toast if logout fails
       Toast.show({
         type: "error",
         text1: "Error",
         text2: error.response?.data?.message || "Logout failed",
       });
-      console.error("Logout Error:", error.response?.data || error.message);
+
+      // Log detailed error information for debugging
+      console.error("Logout Error:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
     }
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+    <View className="flex-1 justify-center items-center mt-5 px-5">
+      <TouchableOpacity className="self-end my-5" onPress={logout}>
         <Image
           source={icons.logout}
           resizeMode="contain"
-          style={styles.logoutIcon}
+          className="w-6 h-6 tint-red-500"
         />
       </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  logoutButton: {
-    alignSelf: "flex-end",
-    marginBottom: 20,
-    marginTop: 20,
-  },
-  logoutIcon: {
-    width: 24,
-    height: 24,
-    tintColor: "red",
-  },
-});
 
 export default Profile;
