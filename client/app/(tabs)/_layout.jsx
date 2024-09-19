@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Image, Text } from "react-native";
-import { Tabs } from "expo-router";
-
+import React, { useCallback } from "react";
+import { View, Image, Text, BackHandler } from "react-native";
+import { Tabs, useNavigation } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native"; // Import this
 import { icons } from "../../constants";
 
 const TabIcon = ({ icon, color, name, focused }) => {
@@ -24,9 +24,37 @@ const TabIcon = ({ icon, color, name, focused }) => {
 };
 
 const TabsLayout = () => {
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        // Get the current route
+        const currentRoute =
+          navigation.getState().routes[navigation.getState().index].name;
+
+        if (currentRoute !== "home") {
+          // Navigate to the "home" tab if not already on it
+          navigation.navigate("home");
+          return true; // Prevent the default back button behavior
+        }
+        // Exit the app if already on the home tab (you can customize this logic)
+        return false; // Let the default back button behavior (exit app)
+      };
+
+      // Add the event listener
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      // Cleanup the event listener when the component unmounts
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [navigation])
+  );
+
   return (
     <>
       <Tabs
+        initialRouteName="home" // Set the initial route to home
         screenOptions={{
           tabBarShowLabel: false,
           tabBarActiveTintColor: "#800080",
@@ -36,9 +64,6 @@ const TabsLayout = () => {
             borderTopWidth: 1,
             borderTopColor: "#232533",
             height: 80,
-            // borderTopLeftRadius: 30,
-            // borderTopRightRadius: 30,
-            // overflow: 'hidden',
           },
         }}
       >
