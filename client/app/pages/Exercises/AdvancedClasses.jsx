@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text } from "react-native";
 import ClassCard from "../../../components/ClassCard";
 import { classes } from "../../data/classes";
+import ClassDetailsModal from "../../../components/ClassDetailsModal";
 
 const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+
   // Filter Advanced classes based on filterText
   const filteredClasses = classes.Advanced.filter((classItem) => {
     const searchKey = searchBy === "Name" ? "Name" : "instructor";
@@ -11,6 +15,16 @@ const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
 
     return searchValue.toLowerCase().includes(filterText.toLowerCase());
   });
+
+  const handleClassSelect = (classItem) => {
+    setSelectedClass(classItem);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedClass(null);
+  };
 
   return (
     <View style={{ marginTop: 16 }}>
@@ -24,6 +38,7 @@ const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
             level={classItem.level}
             duration={classItem.duration}
             image={classItem.image}
+            onPress={() => handleClassSelect(classItem)}
           />
         ))
       ) : (
@@ -31,6 +46,12 @@ const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
           <Text>No classes found</Text>
         </View>
       )}
+
+      <ClassDetailsModal
+        isVisible={isModalVisible}
+        classDetails={selectedClass}
+        onClose={handleCloseModal}
+      />
     </View>
   );
 };

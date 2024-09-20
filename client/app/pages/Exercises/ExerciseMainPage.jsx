@@ -27,7 +27,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
   return (
     <ScrollView className="flex-1 px-5 pt-10 bg-white">
-      {/* Calculate BMI Section */}
       <View className="items-center">
         <Text className="text-3xl font-bold text-center">Exercises</Text>
 
@@ -39,7 +38,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         />
       </View>
 
-      {/* Level Selection Buttons (Scrollable) */}
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} className="mt-6">
         <TouchableOpacity
           onPress={() => setSelectedLevel("Beginner")}
@@ -63,9 +61,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Search Bar and Dropdown */}
       <View className="flex-row items-center mt-5">
-        {/* Search Bar Container */}
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
           <TextInput 
@@ -82,7 +78,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Dropdown Container */}
         <View className="ml-3 mr-[-10]" style={{ width: 150 }}>
           <Picker
             selectedValue={searchBy}
@@ -95,7 +90,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         </View>
       </View>
 
-      {/* Render the classes based on selected level */}
       {renderClasses()}
     </ScrollView>
   );

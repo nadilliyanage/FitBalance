@@ -9,6 +9,7 @@ const ClassCard = ({
   level,
   duration,
   image,
+  onPress,
 }) => {
   return (
     <TouchableOpacity
@@ -17,12 +18,13 @@ const ClassCard = ({
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
-        shadowRadius: 6, // Increased radius for a more prominent shadow
+        shadowRadius: 6,
         borderRadius: 10,
         marginBottom: 40,
         overflow: "hidden",
         elevation: 5,
       }}
+      onPress={onPress}
     >
       <View style={{ position: "relative" }}>
         <Image
@@ -53,12 +55,18 @@ const ClassCard = ({
         </View>
       </View>
       <View style={{ padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Text style={{ fontSize: 18, fontWeight: "600", color: "#1F2937" }}>
             {Name}
           </Text>
           <Text style={{ color: "#6B7280", fontWeight: "600" }}>
-          Instructor: {instructor}
+            Instructor: {instructor}
           </Text>
         </View>
         <Text style={{ color: "#374151", marginTop: 8 }}>{description}</Text>
@@ -77,6 +85,7 @@ ClassCard.propTypes = {
   level: PropTypes.string.isRequired,
   duration: PropTypes.string.isRequired,
   image: PropTypes.any.isRequired,
+  onPress: PropTypes.func.isRequired,
 };
 
 export default ClassCard;
