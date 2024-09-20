@@ -1,23 +1,23 @@
-import { View } from "react-native";
 import React, { useState } from "react";
-import BMICalculator from "../pages/BMICalculator";
-import CustomButton from "../../components/CustomButton";
+import { SafeAreaView, StatusBar } from "react-native";
+import BMICalculator from "../pages/Exercises/BMICalculator";
+import ExerciseMainPage from "../pages/Exercises/ExerciseMainPage";
 
 const Exercises = () => {
   const [showBMICalculator, setShowBMICalculator] = useState(false);
 
-  if (showBMICalculator) {
-    return <BMICalculator />;
-  }
-
   return (
-    <View className="flex-1 items-center pt-10">
-      <CustomButton
-        title="Calculate BMI"
-        handlePress={() => setShowBMICalculator(true)}
-        containerStyles="w-4/5 mt-5"
+    <SafeAreaView className="flex-1 pt-1">
+      <StatusBar 
+        barStyle="dark-content" 
+        backgroundColor="#FFFFFF"
       />
-    </View>
+      {showBMICalculator ? (
+        <BMICalculator />
+      ) : (
+        <ExerciseMainPage onBMIClick={() => setShowBMICalculator(true)} />
+      )}
+    </SafeAreaView>
   );
 };
 
