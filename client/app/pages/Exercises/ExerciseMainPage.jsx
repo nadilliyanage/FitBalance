@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, ScrollView, TouchableOpacity, Text } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomButton from "../../../components/CustomButton";
 import BeginnerClasses from "./BeginnerClasses";
@@ -8,17 +9,19 @@ import AdvancedClasses from "./AdvancedClasses";
 
 const ExerciseMainPage = ({ onBMIClick }) => {
   const [selectedLevel, setSelectedLevel] = useState("Beginner");
+  const [searchText, setSearchText] = useState("");
+  const [searchBy, setSearchBy] = useState("Name");
 
   const renderClasses = () => {
     switch (selectedLevel) {
       case "Beginner":
-        return <BeginnerClasses />;
+        return <BeginnerClasses filterText={searchText} searchBy={searchBy} />;
       case "Intermediate":
-        return <IntermediateClasses />;
+        return <IntermediateClasses filterText={searchText} searchBy={searchBy} />;
       case "Advanced":
-        return <AdvancedClasses />;
+        return <AdvancedClasses filterText={searchText} searchBy={searchBy} />;
       default:
-        return <BeginnerClasses />;
+        return <BeginnerClasses filterText={searchText} searchBy={searchBy} />;
     }
   };
 
@@ -60,12 +63,36 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Search Bar */}
-      <View className="flex-row items-center bg-gray-100 rounded-lg mt-5 px-3 py-2">
-        <TextInput placeholder="Search by class or instructor" className="flex-1 text-gray-700" />
-        <TouchableOpacity className="ml-2">
+      {/* Search Bar and Dropdown */}
+      <View className="flex-row items-center mt-5">
+        {/* Search Bar Container */}
+        <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
-        </TouchableOpacity>
+          <TextInput 
+            placeholder={`Search by ${searchBy}`} 
+            className="flex-1 text-gray-700 ml-2"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+          <TouchableOpacity 
+            onPress={() => setSearchText('')}
+            className="ml-2"
+          >
+            <Icon name="times" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Dropdown Container */}
+        <View className="ml-3 mr-[-10]" style={{ width: 150 }}>
+          <Picker
+            selectedValue={searchBy}
+            style={{ height: 30, width: '100%' }}
+            onValueChange={(itemValue) => setSearchBy(itemValue)}
+          >
+            <Picker.Item label="By Class Name" value="Name" />
+            <Picker.Item label="By Instructor" value="Instructor" />
+          </Picker>
+        </View>
       </View>
 
       {/* Render the classes based on selected level */}

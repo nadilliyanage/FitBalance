@@ -1,35 +1,36 @@
 import React from "react";
-import { View } from "react-native";
-import ClassCard from '../../../components/ClassCard';
-const intensive_yoga = require('../../../assets/images/Exercises/intensive_yoga.jpg');
+import { View, Text } from "react-native";
+import ClassCard from "../../../components/ClassCard";
+import { classes } from "../../data/classes";
 
-const AdvancedClasses = () => {
+const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
+  // Filter Advanced classes based on filterText
+  const filteredClasses = classes.Advanced.filter((classItem) => {
+    const searchKey = searchBy === "Name" ? "Name" : "instructor";
+    const searchValue = classItem[searchKey] || "";
+
+    return searchValue.toLowerCase().includes(filterText.toLowerCase());
+  });
+
   return (
-    <View className="mt-4">
-      <ClassCard 
-        Name="HIIT Extreme" 
-        instructor="Jake" 
-        description="High-Intensity Interval Training to push your limits." 
-        level="Advanced" 
-        duration="1 hour"
-         image={intensive_yoga}
-      />
-      <ClassCard 
-        Name="Advanced Strength" 
-        instructor="Lily" 
-        description="A class focused on heavy lifting and muscle building." 
-        level="Advanced" 
-        duration="1 hour"
-         image={intensive_yoga}
-      />
-      <ClassCard 
-        Name="Martial Arts Conditioning" 
-        instructor="Bruce" 
-        description="Get in shape with martial arts-inspired movements." 
-        level="Advanced" 
-        duration="1 hour"
-         image={intensive_yoga}
-      />
+    <View style={{ marginTop: 16 }}>
+      {filteredClasses.length > 0 ? (
+        filteredClasses.map((classItem) => (
+          <ClassCard
+            key={classItem.Name}
+            Name={classItem.Name}
+            instructor={classItem.instructor}
+            description={classItem.description}
+            level={classItem.level}
+            duration={classItem.duration}
+            image={classItem.image}
+          />
+        ))
+      ) : (
+        <View style={{ alignItems: "center" }}>
+          <Text>No classes found</Text>
+        </View>
+      )}
     </View>
   );
 };

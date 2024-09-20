@@ -7,7 +7,7 @@ const Exercises = () => {
   const [showBMICalculator, setShowBMICalculator] = useState(false);
 
   return (
-    <SafeAreaView className="flex-1 pt-1">
+    <SafeAreaView className="flex-1 pt-2">
       <StatusBar 
         barStyle="dark-content" 
         backgroundColor="#FFFFFF"

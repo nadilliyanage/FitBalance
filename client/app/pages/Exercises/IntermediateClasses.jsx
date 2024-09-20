@@ -1,35 +1,36 @@
 import React from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import ClassCard from "../../../components/ClassCard";
-const power_yoga = require("../../../assets/images/Exercises/power_yoga.jpeg");
+import { classes } from "../../data/classes";
 
-const IntermediateClasses = () => {
+const IntermediateClasses = ({ filterText = "", searchBy = "Name" }) => {
+  // Filter Intermediate classes based on filterText
+  const filteredClasses = classes.Intermediate.filter((classItem) => {
+    const searchKey = searchBy === "Name" ? "Name" : "instructor";
+    const searchValue = classItem[searchKey] || "";
+
+    return searchValue.toLowerCase().includes(filterText.toLowerCase());
+  });
+
   return (
-    <View className="mt-4">
-      <ClassCard
-        Name="Power Yoga"
-        instructor="Sophia"
-        description="Increase strength and stamina through dynamic yoga."
-        level="Intermediate"
-        duration="1 hour"
-        image={power_yoga}
-      />
-      <ClassCard
-        Name="Functional Training"
-        instructor="Max"
-        description="Train your body for real-world activities."
-        level="Intermediate"
-        duration="1 hour"
-        image={power_yoga}
-      />
-      <ClassCard
-        Name="Pilates Fusion"
-        instructor="Lucy"
-        description="A balanced blend of Pilates and strength training."
-        level="Intermediate"
-        duration="1 hour"
-        image={power_yoga}
-      />
+    <View style={{ marginTop: 16 }}>
+      {filteredClasses.length > 0 ? (
+        filteredClasses.map((classItem) => (
+          <ClassCard
+            key={classItem.Name}
+            Name={classItem.Name}
+            instructor={classItem.instructor}
+            description={classItem.description}
+            level={classItem.level}
+            duration={classItem.duration}
+            image={classItem.image}
+          />
+        ))
+      ) : (
+        <View style={{ alignItems: "center" }}>
+          <Text>No classes found</Text>
+        </View>
+      )}
     </View>
   );
 };
