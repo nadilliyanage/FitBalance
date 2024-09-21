@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import BMIModal from "./BMIModal"; // Import the BMIModal component
 
-const LazyExercices = lazy(() => import("../(tabs)/Exercises"));
+const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 
 const { width } = Dimensions.get("window");
 
@@ -65,7 +65,7 @@ const BMICalculator = () => {
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView>
-        <View className="p-5">
+        <View className="pr-5 pl-5 pb-5">
           <View className="flex-row items-center justify-center mb-5">
             <TouchableOpacity
               style={{ position: "absolute", left: 10 }}
