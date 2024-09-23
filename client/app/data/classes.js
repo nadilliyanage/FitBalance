@@ -15,7 +15,7 @@ export const classes = {
     },
     {
       Name: "Bodyweight Training",
-      instructor: "Sara",
+      instructor: "John",
       description: "An introduction to exercises that require no equipment.",
       level: "Beginner",
       duration: "1 hour",
@@ -28,7 +28,7 @@ export const classes = {
     },
     {
       Name: "Stretch and Relax",
-      instructor: "John",
+      instructor: "Sara",
       description: "Relax your muscles with gentle stretching exercises.",
       level: "Beginner",
       duration: "1 hour",
