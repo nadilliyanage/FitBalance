@@ -1,33 +1,34 @@
 import { View, Image, Text, TouchableOpacity, FlatList } from "react-native";
-import React, { useContext } from "react";
-import { icons } from "../../constants";
+import React, { useContext, useState } from "react";
+import { icons, images } from "../../constants";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchInput from "../../components/SearchInput";
 import { AuthContext } from "../../context/authContext";
+import Profile from "../pages/profile";
 
 const Home = () => {
   //global state
   const [state] = useContext(AuthContext);
 
-  const router = useRouter();
+  const [showProfile, setShowProfile] = useState(false);
 
-  const handleProfileNavigation = () => {
-    router.replace("../pages/profile");
-  };
+  if (showProfile) {
+    return <Profile />; // Display the Profile directly
+  }
 
   return (
     <SafeAreaView className="bg-secondary-100 rounded-b-3xl">
       <View className="my-6 px-4 space-y-6">
         <View className="justify-between items-start flex-row mb-6">
           <TouchableOpacity
-            onPress={handleProfileNavigation}
-            className="bg-primary rounded-full p-2 absolute right-4"
+            onPress={() => setShowProfile(true)} // Use onPress instead of handlePress
+            className="bg-primary rounded-full p-1 absolute right-4"
           >
             <Image
-              source={icons.profile}
-              resizeMode="contain"
-              style={{ width: 24, height: 24, tintColor: "purple" }}
+              source={images.profile}
+              resizeMode="cover"
+              className="w-10 h-10 rounded-full"
             />
           </TouchableOpacity>
           <View>
