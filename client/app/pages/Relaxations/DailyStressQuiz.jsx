@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/CustomButton";
 
 const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
+const LazyRecommendations = lazy(() => import("./Recommendations"));
 
 const questions = [
   "1. Did you feel overwhelmed by your tasks today?",
@@ -33,6 +34,7 @@ const DailyStressQuiz = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [result, setResult] = useState(null);
   const [back, setBack] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(false);
 
   const handleAnswer = (value) => {
     setSelectedAnswer(value);
@@ -76,6 +78,14 @@ const DailyStressQuiz = () => {
     return (
       <Suspense fallback={<Text>Loading...</Text>}>
         <LazyRelaxations />
+      </Suspense>
+    );
+  }
+
+  if (showRecommendations) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <LazyRecommendations stressLevel={result?.level} />
       </Suspense>
     );
   }
@@ -141,9 +151,9 @@ const DailyStressQuiz = () => {
                   progress={result.progress}
                   width={200}
                   height={20}
-                  color="#6B46C1" // Purple color for progress bar
+                  color="#6B46C1"
                   borderRadius={10}
-                  unfilledColor="#E2E8F0" // Light gray color for unfilled part
+                  unfilledColor="#E2E8F0"
                 />
                 <Text className="text-xl font-bold text-center mt-4">
                   This is classified as a
@@ -152,6 +162,11 @@ const DailyStressQuiz = () => {
                   "{result.level}".
                 </Text>
                 <CustomButton
+                  title="Recommendations"
+                  containerStyles="w-full mt-7"
+                  handlePress={() => setShowRecommendations(true)}
+                />
+                <CustomButton
                   title="Restart Quiz"
                   containerStyles="w-full mt-7"
                   handlePress={() => {
@@ -159,7 +174,7 @@ const DailyStressQuiz = () => {
                     setCurrentQuestionIndex(0);
                     setResult(null);
                   }}
-                ></CustomButton>
+                />
                 <CustomButton
                   title="Back to Relaxations"
                   handlePress={() => setBack(true)}

@@ -14,14 +14,22 @@
     },
     "ios": {
       "supportsTablet": true,
-      "package":"com.jsm.fitbalance360"
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take photos for profile picture updates.",
+        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to upload and update profile pictures."
+      },
+      "package": "com.jsm.fitbalance360"
     },
     "android": {
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package":"com.jsm.fitbalance360"
+      "package": "com.jsm.fitbalance360"
     },
     "web": {
       "bundler": "metro",
