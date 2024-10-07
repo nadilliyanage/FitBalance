@@ -1,64 +1,63 @@
 import { View, Image, Text, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FormField from "../../components/FormField";
-import CustomButton from "../../components/CustomButton";
-import { images } from "../../constants";
+import FormField from "../../components/FormField"; // Your custom form field component
+import CustomButton from "../../components/CustomButton"; // Your custom button component
+import { images } from "../../constants"; // Path to your images
 import { Link, useRouter } from "expo-router";
-import axios from "axios";
+import { auth, db } from "../../firebaseConfig"; // Import auth and Firestore (db) from firebaseConfig
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { setDoc, doc } from "firebase/firestore"; // Firestore methods
 import Toast from "react-native-toast-message";
-import { API_BASE_URL } from "@env";
-
-// Set the base URL for axios globally
-axios.defaults.baseURL = API_BASE_URL;
 
 const SignUp = () => {
   const router = useRouter();
-
-  // States
-  const [name, setName] = useState("");
+  const [username, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // Function to handle form submission
-  const handleSubmit = async () => {
+  const create = async () => {
+    // Basic input validation
+    if (!username || !email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required!",
+      });
+      return;
+    }
+
     try {
-      setLoading(true);
-
-      if (!name || !email || !password) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Please fill all fields",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // API request to register a new user
-      const { data } = await axios.post("/auth/register", {
-        name,
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
         email,
-        password,
+        password
+      );
+      const user = userCredential.user;
+
+      // Add user to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        email: email,
+        createdAt: new Date().toISOString(),
       });
 
       Toast.show({
         type: "success",
-        text1: "Success",
-        text2: data && data.message,
+        text1: "Account created successfully!",
       });
 
-      router.replace("/sign-in"); // Navigate to the sign-in page
+      console.log("User created and details saved to Firestore");
+
+      // Navigate to the Sign In page after successful account creation
+      router.push("/home");
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Error",
-        text2: error.response?.data?.message || "An error occurred",
+        text1: "Error creating account",
+        text2: error.message,
       });
-      console.error("Sign-up Error:", error);
-    } finally {
-      setLoading(false);
+      console.log(error);
     }
   };
 
@@ -74,20 +73,20 @@ const SignUp = () => {
             />
           </View>
           <Text className="text-3xl text-black mt-1 font-psemibold">
-            Sign up
+            Sign Up
           </Text>
 
           <FormField
             title="Username"
-            value={name}
-            handleChangeText={(e) => setName(e)}
+            value={username}
+            handleChangeText={setName}
             otherStyles="mt-7"
           />
 
           <FormField
             title="Email"
             value={email}
-            handleChangeText={(e) => setEmail(e)}
+            handleChangeText={setEmail}
             otherStyles="mt-7"
             keyboardType="email-address"
           />
@@ -95,16 +94,15 @@ const SignUp = () => {
           <FormField
             title="Password"
             value={password}
-            handleChangeText={(e) => setPassword(e)}
+            handleChangeText={setPassword}
             otherStyles="mt-7"
             secureTextEntry
           />
 
           <CustomButton
             title="Sign Up"
-            handlePress={handleSubmit}
+            handlePress={create}
             containerStyles="mt-7"
-            isLoading={loading}
           />
 
           <View className="justify-center pt-5 flex-row gap-2">
@@ -117,6 +115,7 @@ const SignUp = () => {
           </View>
         </View>
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 };
