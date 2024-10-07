@@ -1,33 +1,26 @@
 import { View, Image, Text, ScrollView } from "react-native";
-import React, { useState, useContext } from "react";
-import { AuthContext } from "../../context/authContext";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FormField from "../../components/FormField";
-import CustomButton from "../../components/CustomButton";
-import { images } from "../../constants";
+import FormField from "../../components/FormField"; // Your custom form field component
+import CustomButton from "../../components/CustomButton"; // Your custom button component
+import { images } from "../../constants"; // Path to your images
 import { Link, useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+import { auth } from "../../firebaseConfig"; // Import auth from firebaseConfig
+import { signInWithEmailAndPassword } from "firebase/auth";
 import Toast from "react-native-toast-message";
-import { API_BASE_URL } from "@env";
-
-axios.defaults.baseURL = API_BASE_URL;
 
 const SignIn = () => {
-  const [state, setState] = useContext(AuthContext);
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const submit = async () => {
-    if (form.email === "" || form.password === "") {
+    if (email === "" || password === "") {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: "Please fill in all the fields",
+        text2: "Please fill in all fields",
       });
       return;
     }
@@ -35,38 +28,31 @@ const SignIn = () => {
     setIsSubmitting(true);
 
     try {
-      const { data } = await axios.post("/auth/login", {
-        email: form.email,
-        password: form.password,
+      await signInWithEmailAndPassword(auth, email, password);
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Signed in successfully",
       });
-
-      if (data.success) {
-        const user = data.user;
-        const token = data.token;
-
-        setState({ user, token });
-        await AsyncStorage.setItem("@auth", JSON.stringify({ user, token }));
-
-        Toast.show({
-          type: "success",
-          text1: "Success",
-          text2: "Signed in successfully",
-        });
-        router.replace("/home");
-      } else {
+      router.replace("/home"); // Adjust the path as needed
+    } catch (error) {
+      // Check for specific error codes
+      if (error.code === "auth/invalid-credential") {
         Toast.show({
           type: "error",
-          text1: "Error",
-          text2: data.message || "An error occurred",
+          text1: "Invalid Credential",
+          text2: "The email or password is incorrect.",
         });
+      } else if (error.code === "auth/invalid-email") {
+        Toast.show({
+          type: "error",
+          text1: "Invalid Email",
+          text2: "The email address is not valid.",
+        });
+      } else {
+        // Optionally handle other errors (if necessary)
+        console.error("SignIn Error:", error.message);
       }
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error.response?.data?.message || "Something went wrong",
-      });
-      console.error("SignIn Error:", error.response?.data || error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -89,16 +75,16 @@ const SignIn = () => {
 
           <FormField
             title="Email"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            value={email}
+            handleChangeText={setEmail}
             otherStyles="mt-10"
             keyboardType="email-address"
           />
 
           <FormField
             title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
+            value={password}
+            handleChangeText={setPassword}
             otherStyles="mt-7"
             secureTextEntry
           />
@@ -120,6 +106,7 @@ const SignIn = () => {
           </View>
         </View>
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 };

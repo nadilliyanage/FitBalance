@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import { API_BASE_URL } from "@env";
+import { auth } from "../firebaseConfig"; // Import Firebase auth
+import { onAuthStateChanged } from "firebase/auth";
 
 // Create AuthContext
 const AuthContext = createContext();
@@ -13,36 +13,30 @@ const AuthProvider = ({ children }) => {
     token: null,
   });
 
-  axios.defaults.baseURL = API_BASE_URL;
-
+  // Listen for Firebase Auth state changes
   useEffect(() => {
-    const loadLocalStorageData = async () => {
-      try {
-        const data = await AsyncStorage.getItem("@auth");
-        if (data) {
-          const parsedData = JSON.parse(data);
-          if (parsedData) {
-            setState({
-              user: parsedData.user || null,
-              token: parsedData.token || null,
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error loading data from local storage:", error);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // If user is logged in, get the token
+        const token = await user.getIdToken();
+
+        setState({
+          user: user,
+          token: token,
+        });
+
+        // Optionally save user data in AsyncStorage
+        await AsyncStorage.setItem("@auth", JSON.stringify({ user, token }));
+      } else {
+        // Clear the state if no user is logged in
+        setState({ user: null, token: null });
+        await AsyncStorage.removeItem("@auth");
       }
-    };
+    });
 
-    loadLocalStorageData();
+    // Clean up the subscription when the component unmounts
+    return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (state.token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
-    } else {
-      delete axios.defaults.headers.common["Authorization"];
-    }
-  }, [state.token]);
 
   return (
     <AuthContext.Provider value={[state, setState]}>

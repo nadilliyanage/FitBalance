@@ -1,17 +1,41 @@
 import { View, Image, Text, TouchableOpacity, FlatList } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { icons, images } from "../../constants";
-import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchInput from "../../components/SearchInput";
 import { AuthContext } from "../../context/authContext";
 import Profile from "../pages/profile";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore functions
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
 const Home = () => {
-  //global state
+  // Global state
   const [state] = useContext(AuthContext);
-
+  const [userName, setUserName] = useState("Guest"); // State to store the user's name
   const [showProfile, setShowProfile] = useState(false);
+  const auth = getAuth(); // Get the Auth instance
+  const db = getFirestore(); // Get the Firestore instance
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser; // Get the current user
+        if (user) {
+          const userDocRef = doc(db, "users", user.uid); // Reference to the user's document
+          const userDoc = await getDoc(userDocRef); // Get the document
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data(); // Fetch user data
+            setUserName(userData.username || "No Name"); // Set the username, assuming it's stored under 'username' key
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUserData(); // Fetch user data on component mount
+  }, [auth]);
 
   if (showProfile) {
     return <Profile />; // Display the Profile directly
@@ -36,7 +60,7 @@ const Home = () => {
               Welcome Back
             </Text>
             <Text className="text-2xl font-psemibold text-white">
-              {state?.user?.name || "Guest"}
+              {userName} {/* Display the user's username */}
             </Text>
           </View>
         </View>
