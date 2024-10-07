@@ -7,52 +7,59 @@ import {
   BackHandler,
 } from "react-native";
 import React, { useContext, useEffect, useState, lazy, Suspense } from "react";
+import { useRouter } from "expo-router";
 import { icons, images } from "../../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker"; // For picking images
+import * as ImagePicker from "expo-image-picker";
 import { AuthContext } from "../../context/authContext";
-import axios from "axios";
-import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import { API_BASE_URL } from "@env";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage
-import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
-
-// Set the base URL for axios
-axios.defaults.baseURL = API_BASE_URL;
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAuth, signOut, updateProfile } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore
+import { useFocusEffect } from "@react-navigation/native";
 
 const LazyHome = lazy(() => import("../(tabs)/home"));
 
 const Profile = () => {
   const router = useRouter();
-  const [state, setState] = useContext(AuthContext); // Get auth context
+  const [state, setState] = useContext(AuthContext);
   const [profile, setProfile] = useState({
     name: "",
     email: "",
     profileImage: "",
   });
-  const [uploading, setUploading] = useState(false); // For tracking image upload
+  const [uploading, setUploading] = useState(false);
   const [back, setBack] = useState(false);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        if (state?.user) {
-          const { name, email, profileImage } = state.user;
-          setProfile({
-            name,
-            email,
-            profileImage: profileImage || images.profile,
-          });
+        if (user) {
+          const db = getFirestore();
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setProfile({
+              name: userData.username || "No Name",
+              email: userData.email || "No Email",
+              profileImage: userData.profileImage || images.profile,
+            });
+          } else {
+            console.log("No such user in Firestore");
+          }
         } else {
           const data = await AsyncStorage.getItem("@auth");
           if (data) {
-            const user = JSON.parse(data).user;
+            const storedUser = JSON.parse(data).user;
             setProfile({
-              name: user.name,
-              email: user.email,
-              profileImage: user.profileImage || images.profile,
+              name: storedUser.name || "No Name",
+              email: storedUser.email || "No Email",
+              profileImage: storedUser.profileImage || images.profile,
             });
           }
         }
@@ -62,7 +69,7 @@ const Profile = () => {
     };
 
     fetchProfileData();
-  }, [state]);
+  }, [user]);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -79,7 +86,7 @@ const Profile = () => {
     });
 
     if (!result.cancelled) {
-      await handleImageUpload(result.uri); // Upload the image
+      await handleImageUpload(result.uri);
     }
   };
 
@@ -87,16 +94,20 @@ const Profile = () => {
     setUploading(true);
     try {
       const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image for upload.");
+      }
       const blob = await response.blob();
 
+      console.log("Blob created:", blob); // Log blob for debugging
+
       const storage = getStorage();
-      const storageRef = ref(storage, `profile_pictures/${state.user._id}`);
+      const storageRef = ref(storage, `profile_pictures/${user.uid}`);
 
-      await uploadBytes(storageRef, blob); // Upload the image
-
+      await uploadBytes(storageRef, blob);
       const downloadURL = await getDownloadURL(storageRef);
 
-      await updateProfilePicture(downloadURL);
+      await updateProfile(user, { photoURL: downloadURL });
 
       setProfile((prev) => ({ ...prev, profileImage: downloadURL }));
       setState((prev) => ({
@@ -118,36 +129,20 @@ const Profile = () => {
         text2: "Your profile picture has been updated.",
       });
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading image:", error); // Log full error object
       Toast.show({
         type: "error",
         text1: "Upload failed",
-        text2: "Failed to upload profile picture.",
+        text2: error.message || "Failed to upload profile picture.",
       });
     } finally {
       setUploading(false);
     }
   };
 
-  const updateProfilePicture = async (downloadURL) => {
-    try {
-      await axios.put("/auth/update-profile-picture", {
-        profileImage: downloadURL,
-      });
-    } catch (error) {
-      console.error("Error updating profile picture:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2:
-          error.response?.data?.message || "Failed to update profile picture.",
-      });
-    }
-  };
-
   const logout = async () => {
     try {
-      await axios.post("/auth/logout");
+      await signOut(auth);
       await AsyncStorage.removeItem("@auth");
       setState({ user: null, token: null });
 
@@ -162,13 +157,11 @@ const Profile = () => {
       Toast.show({
         type: "error",
         text1: "Error",
-        text2: error.response?.data?.message || "Logout failed",
+        text2: error.message || "Logout failed",
       });
 
       console.error("Logout Error:", {
         message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
       });
     }
   };
@@ -176,8 +169,8 @@ const Profile = () => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        router.replace("/home"); // Redirect to the home page
-        return true; // Prevent default behavior (navigation)
+        router.replace("/home");
+        return true;
       };
 
       const backHandler = BackHandler.addEventListener(
@@ -185,7 +178,7 @@ const Profile = () => {
         onBackPress
       );
 
-      return () => backHandler.remove(); // Cleanup the event listener on unmount
+      return () => backHandler.remove();
     }, [])
   );
 
@@ -208,41 +201,27 @@ const Profile = () => {
             Back to Home
           </Text>
         </TouchableOpacity>
-        {/* Profile Image */}
         <Image
           source={
             profile.profileImage
               ? { uri: profile.profileImage }
               : images.profile
           }
+          className="w-36 h-36 rounded-full border-2 border-gray-200 mb-4"
           resizeMode="cover"
-          className="w-32 h-32 rounded-full mb-5"
         />
-
-        {/* Button to change profile picture */}
-        <Button
-          title="Change Profile Picture"
-          onPress={pickImage}
-          disabled={uploading}
-        />
-
-        {/* User's Name */}
-        <Text className="text-xl font-semibold mb-2">{profile.name}</Text>
-
-        {/* User's Email */}
-        <Text className="text-lg text-gray-500 mb-5">{profile.email}</Text>
-
-        {/* Logout Button */}
-        <TouchableOpacity className="my-5" onPress={logout}>
-          <Text className="text-lg text-red-500">
-            Log Out{"  "}
-            <Image
-              source={icons.logout}
-              resizeMode="contain"
-              className="w-6 h-6 tint-red-500"
-            />
-          </Text>
+        <Text className="text-2xl font-semibold mb-1">{profile.name}</Text>
+        <Text className="text-sm font-medium text-gray-500 mb-5">
+          {profile.email}
+        </Text>
+        <TouchableOpacity onPress={pickImage} disabled={uploading}>
+          <View className="bg-purple-500 px-4 py-2 rounded-lg">
+            <Text className="text-white font-semibold">
+              {uploading ? "Uploading..." : "Edit Profile Picture"}
+            </Text>
+          </View>
         </TouchableOpacity>
+        <Button title="Logout" onPress={logout} color="#841584" />
       </View>
     </SafeAreaView>
   );
