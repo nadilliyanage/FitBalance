@@ -18,19 +18,50 @@ const NutriCal = () => {
   }
 
   return (
-    <SafeAreaView className="bg-primary h-full">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView>
-        <View className="w-full min-h-[85vh] px-4 my-6">
-          <CustomButton
-            title="Calculate Nutrition"
-            handlePress={() => setShowCalculator(true)} // Set to Nutrition Calculator
-            containerStyles="w-full"
-          />
-          <CustomButton
-            title="Enter Health Data"
-            handlePress={() => setShowEnterHealthData(true)} // Set to Enter Health Data
-            containerStyles="w-full"
-          />
+        <View style={{ padding: 20 }}>
+          {/* Header section */}
+          <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Track your diet journey</Text>
+
+          {/* Calorie Progress */}
+          <View style={{ alignItems: 'center', marginBottom: 30 }}>
+            <Text style={{ fontSize: 40, fontWeight: 'bold' }}>1721 Kcal</Text>
+            <Text style={{ fontSize: 16, color: 'gray' }}>of 2213 kcal</Text>
+
+            {/* Macros */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 20 }}>
+              <View>
+                <Text style={{ fontSize: 18 }}>Protein</Text>
+                <Text>78/90g</Text>
+              </View>
+              <View>
+                <Text style={{ fontSize: 18 }}>Fats</Text>
+                <Text>45/70g</Text>
+              </View>
+              <View>
+                <Text style={{ fontSize: 18 }}>Carbs</Text>
+                <Text>95/110g</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Buttons for Health Data and Nutrition Calculator */}
+          <View style={{ marginBottom: 30 }}>
+            <CustomButton
+              title="Enter Health Data"
+              handlePress={() => setShowEnterHealthData(true)}
+              containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
+            />
+          </View>
+
+          <View>
+            <CustomButton
+              title="Nutrition Calculator"
+              handlePress={() => setShowCalculator(true)}
+              containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
