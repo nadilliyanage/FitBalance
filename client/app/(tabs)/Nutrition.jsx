@@ -49,19 +49,29 @@ const NutriCal = () => {
           {/* Buttons for Health Data and Nutrition Calculator */}
           <View style={{ marginBottom: 30 }}>
             <CustomButton
-              title="Enter Health Data"
-              handlePress={() => setShowEnterHealthData(true)}
-              containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
-            />
-          </View>
-
-          <View>
-            <CustomButton
               title="Nutrition Calculator"
               handlePress={() => setShowCalculator(true)}
               containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
             />
           </View>
+
+          <View style={{ marginBottom: 30 }}>
+            <CustomButton
+              title="Health Data"
+              handlePress={() => setShowEnterHealthData(true)}
+              containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
+            />
+          </View>
+
+          <View style={{ marginBottom: 30 }}>
+            <CustomButton
+              title="Food Suggestions"
+              handlePress={() => setShowEnterHealthData(true)}
+              containerStyles={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10 }}
+            />
+          </View>
+
+          
         </View>
       </ScrollView>
     </SafeAreaView>
