@@ -1,23 +1,52 @@
-import React, { useState } from "react";
-import { View, TextInput, ScrollView, TouchableOpacity, Text } from "react-native";
-import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import Icon from "react-native-vector-icons/FontAwesome";
 import CustomButton from "../../../components/CustomButton";
 import BeginnerClasses from "./BeginnerClasses";
 import IntermediateClasses from "./IntermediateClasses";
 import AdvancedClasses from "./AdvancedClasses";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import JustForYouPage from "./JustForYouPage";
 
 const ExerciseMainPage = ({ onBMIClick }) => {
   const [selectedLevel, setSelectedLevel] = useState("Beginner");
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("Name");
+  const [hasBMIResult, setHasBMIResult] = useState(false); // Track if BMI result exists
+
+  useEffect(() => {
+    // Check if there's a stored BMI result in AsyncStorage
+    const checkBMIResult = async () => {
+      try {
+        const bmiResult = await AsyncStorage.getItem("bmiResult");
+        if (bmiResult) {
+          setHasBMIResult(true);
+        }
+      } catch (error) {
+        console.error("Error retrieving BMI result from AsyncStorage", error);
+      }
+    };
+
+    checkBMIResult();
+  }, []);
 
   const renderClasses = () => {
     switch (selectedLevel) {
+      case "JustForYou":
+        return <JustForYouPage filterText={searchText} searchBy={searchBy} />;
       case "Beginner":
         return <BeginnerClasses filterText={searchText} searchBy={searchBy} />;
       case "Intermediate":
-        return <IntermediateClasses filterText={searchText} searchBy={searchBy} />;
+        return (
+          <IntermediateClasses filterText={searchText} searchBy={searchBy} />
+        );
       case "Advanced":
         return <AdvancedClasses filterText={searchText} searchBy={searchBy} />;
       default:
@@ -31,49 +60,101 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         <Text className="text-3xl font-bold text-center">Exercises</Text>
 
         <CustomButton
-          title="Calculate BMI to Get Started"
+          title={
+            hasBMIResult ? "Calculate BMI" : "Calculate BMI to Get Started"
+          } // Change button text based on BMI result
           handlePress={onBMIClick}
           containerStyles="w-full mt-4 bg-purple-500"
           textStyle="text-white text-lg"
         />
       </View>
 
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} className="mt-6">
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        className="mt-6"
+      >
+        {hasBMIResult && (
+          <TouchableOpacity
+            onPress={() => setSelectedLevel("JustForYou")}
+            className={`px-4 py-2 mx-2 rounded-full ${
+              selectedLevel === "JustForYou"
+                ? "bg-purple-500"
+                : "bg-white border border-gray-400"
+            }`}
+          >
+            <Text
+              className={
+                selectedLevel === "JustForYou" ? "text-white" : "text-black"
+              }
+            >
+              Just for You
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           onPress={() => setSelectedLevel("Beginner")}
-          className={`px-4 py-2 mx-2 rounded-full ${selectedLevel === "Beginner" ? "bg-purple-500" : "bg-white border border-gray-400"}`}
+          className={`px-4 py-2 mx-2 rounded-full ${
+            selectedLevel === "Beginner"
+              ? "bg-purple-500"
+              : "bg-white border border-gray-400"
+          }`}
         >
-          <Text className={selectedLevel === "Beginner" ? "text-white" : "text-black"}>Beginner</Text>
+          <Text
+            className={
+              selectedLevel === "Beginner" ? "text-white" : "text-black"
+            }
+          >
+            Beginner
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Intermediate")}
-          className={`px-4 py-2 mx-2 rounded-full ${selectedLevel === "Intermediate" ? "bg-purple-500" : "bg-white border border-gray-400"}`}
+          className={`px-4 py-2 mx-2 rounded-full ${
+            selectedLevel === "Intermediate"
+              ? "bg-purple-500"
+              : "bg-white border border-gray-400"
+          }`}
         >
-          <Text className={selectedLevel === "Intermediate" ? "text-white" : "text-black"}>Intermediate</Text>
+          <Text
+            className={
+              selectedLevel === "Intermediate" ? "text-white" : "text-black"
+            }
+          >
+            Intermediate
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Advanced")}
-          className={`px-4 py-2 mx-2 rounded-full ${selectedLevel === "Advanced" ? "bg-purple-500" : "bg-white border border-gray-400"}`}
+          className={`px-4 py-2 mx-2 rounded-full ${
+            selectedLevel === "Advanced"
+              ? "bg-purple-500"
+              : "bg-white border border-gray-400"
+          }`}
         >
-          <Text className={selectedLevel === "Advanced" ? "text-white" : "text-black"}>Advanced</Text>
+          <Text
+            className={
+              selectedLevel === "Advanced" ? "text-white" : "text-black"
+            }
+          >
+            Advanced
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
       <View className="flex-row items-center mt-5">
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
-          <TextInput 
-            placeholder={`Search by ${searchBy}`} 
+          <TextInput
+            placeholder={`Search by ${searchBy}`}
             className="flex-1 text-gray-700 ml-2"
             value={searchText}
             onChangeText={setSearchText}
           />
-          <TouchableOpacity 
-            onPress={() => setSearchText('')}
-            className="ml-2"
-          >
+          <TouchableOpacity onPress={() => setSearchText("")} className="ml-2">
             <Icon name="times" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -81,7 +162,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         <View className="ml-3 mr-[-10]" style={{ width: 150 }}>
           <Picker
             selectedValue={searchBy}
-            style={{ height: 30, width: '100%' }}
+            style={{ height: 30, width: "100%" }}
             onValueChange={(itemValue) => setSearchBy(itemValue)}
           >
             <Picker.Item label="By Class Name" value="Name" />

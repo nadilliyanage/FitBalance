@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import BMIModal from "./BMIModal"; // Import the BMIModal component
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 
@@ -34,19 +35,27 @@ const BMICalculator = () => {
     setHeight(newHeight.toString());
   }, []);
 
-  const calculateBMI = () => {
+  const calculateBMI = async () => {
     const weightNum = parseFloat(weight);
     const heightNum = parseFloat(height) / 100;
     if (weightNum > 0 && heightNum > 0) {
       const bmi = (weightNum / (heightNum * heightNum)).toFixed(1);
-      setBmiResult({
+      const bmiDetails = {
         bmi,
         weight: weightNum,
         height,
         age,
         gender,
-      });
-      setModalVisible(true);
+      };
+  
+      try {
+        // Store the BMI details in AsyncStorage
+        await AsyncStorage.setItem('bmiResult', JSON.stringify(bmiDetails));
+        setBmiResult(bmiDetails);
+        setModalVisible(true);
+      } catch (error) {
+        console.error('Error saving BMI details to local storage:', error);
+      }
     } else {
       Alert.alert("Invalid Input", "Please enter valid weight and height.");
     }
