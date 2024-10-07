@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, FlatList, Alert } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { classes } from '../../data/classes'; // Adjust the path to your classes data
+import { View, Text, FlatList, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ClassCard from "../../../components/ClassCard";
+import ClassDetailsModal from "../../../components/ClassDetailsModal"; // Import the ClassDetailsModal
+import { classes } from "../../data/classes";
 
-const JustForYouPage = () => {
+const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   const [bmiResult, setBmiResult] = useState(null);
-  const [filteredClasses, setFilteredClasses] = useState([]);
+  const [justForYouClasses, setJustForYouClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState(null); // State for selected class
+  const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
 
   useEffect(() => {
     const fetchBMIDetails = async () => {
       try {
-        const storedBMI = await AsyncStorage.getItem('bmiResult');
+        const storedBMI = await AsyncStorage.getItem("bmiResult");
         if (storedBMI) {
           const bmiData = JSON.parse(storedBMI);
           setBmiResult(bmiData);
           filterClasses(bmiData.bmi);
         }
       } catch (error) {
-        console.error('Error fetching BMI details from local storage:', error);
+        console.error("Error fetching BMI details from local storage:", error);
         Alert.alert("Error", "Failed to load BMI data.");
       }
     };
@@ -38,21 +42,41 @@ const JustForYouPage = () => {
       recommendedClasses = classes.Advanced; // Obese -> Recommend Advanced classes
     }
 
-    setFilteredClasses(recommendedClasses);
+    setJustForYouClasses(recommendedClasses);
+  };
+
+  // Filtering the classes based on filterText and searchBy criteria
+  const filteredClasses = justForYouClasses.filter((classItem) => {
+    const searchKey = searchBy === "Name" ? "Name" : "instructor";
+    const searchValue = classItem[searchKey] || "";
+
+    return searchValue.toLowerCase().includes(filterText.toLowerCase());
+  });
+
+  const handleClassSelect = (classItem) => {
+    setSelectedClass(classItem);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedClass(null);
   };
 
   const renderClassItem = ({ item }) => (
-    <View className="border p-3 rounded mb-2">
-      <Text className="font-bold">{item.Name}</Text>
-      <Text>Instructor: {item.instructor}</Text>
-      <Text>{item.description}</Text>
-      <Text>Level: {item.level}</Text>
-      <Text>Duration: {item.duration}</Text>
-    </View>
+    <ClassCard
+      Name={item.Name}
+      instructor={item.instructor}
+      description={item.description}
+      level={item.level}
+      duration={item.duration}
+      image={item.image}
+      onPress={() => handleClassSelect(item)} // Use handleClassSelect
+    />
   );
 
   return (
-    <View className="flex-1 justify-center items-center bg-white p-5">
+    <View className="flex-1 justify-center items-center bg-white py-5">
       <Text className="text-xl font-bold mb-5">Classes Just For You</Text>
       {bmiResult && filteredClasses.length > 0 ? (
         <FlatList
@@ -62,9 +86,14 @@ const JustForYouPage = () => {
           contentContainerStyle={{ paddingBottom: 20 }}
         />
       ) : (
-        <Text>No classes available for your BMI category.</Text> // Ensure this is wrapped in <Text>
+        <Text>No classes available for your BMI category.</Text>
       )}
-      
+
+      <ClassDetailsModal
+        isVisible={isModalVisible}
+        classDetails={selectedClass}
+        onClose={handleCloseModal} // Pass the close function
+      />
     </View>
   );
 };

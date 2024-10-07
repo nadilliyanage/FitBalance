@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, lazy, useState, Suspense } from "react";
 import { View, Text, TouchableOpacity, Modal, Animated } from "react-native";
 import { BlurView } from "expo-blur";
 import Icon from 'react-native-vector-icons/FontAwesome'; // Ensure this library is installed
 
+const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
+
 const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
   const moveValue = useRef(new Animated.Value(0)).current;
+  const [back, setBack] = useState(false);
 
   // Define the horizontal movement animation
   const moveAnimation = Animated.loop(
@@ -98,8 +101,16 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
 
   // Navigation function
   const handleNavigate = () => {
-    navigation.navigate("ExercisePage"); // Replace "ExercisePage" with your actual route name
+    navigation.navigate("/ExercisePage"); // Replace "ExercisePage" with your actual route name
   };
+
+  if (back) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <LazyExercices />
+      </Suspense>
+    );
+  }
 
   return (
     <Modal
@@ -200,7 +211,7 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
 
           {/* Navigate Button */}
           <TouchableOpacity
-            onPress={handleNavigate}
+            onPress={() => setBack(true)}
             style={{
               backgroundColor: "#28a745",
               paddingVertical: 8,

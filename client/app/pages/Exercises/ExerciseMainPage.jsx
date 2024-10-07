@@ -14,28 +14,37 @@ import IntermediateClasses from "./IntermediateClasses";
 import AdvancedClasses from "./AdvancedClasses";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import JustForYouPage from "./JustForYouPage";
+import BMIDetails from "./BMIDetails";
 
 const ExerciseMainPage = ({ onBMIClick }) => {
-  const [selectedLevel, setSelectedLevel] = useState("Beginner");
+  const [selectedLevel, setSelectedLevel] = useState("Beginner"); // Default is Beginner
   const [searchText, setSearchText] = useState("");
   const [searchBy, setSearchBy] = useState("Name");
   const [hasBMIResult, setHasBMIResult] = useState(false); // Track if BMI result exists
+  const [showBMIDetails, setShowBMIDetails] = useState(false); // State to toggle BMI details
+  const [bmiResult, setBmiResult] = useState(null); // Store the BMI result
 
   useEffect(() => {
-    // Check if there's a stored BMI result in AsyncStorage
-    const checkBMIResult = async () => {
-      try {
-        const bmiResult = await AsyncStorage.getItem("bmiResult");
-        if (bmiResult) {
-          setHasBMIResult(true);
-        }
-      } catch (error) {
-        console.error("Error retrieving BMI result from AsyncStorage", error);
-      }
-    };
-
     checkBMIResult();
   }, []);
+
+  const checkBMIResult = async () => {
+    try {
+      const result = await AsyncStorage.getItem("bmiResult");
+      const hasResult = !!result;
+      setHasBMIResult(hasResult);
+      setBmiResult(result); // Set the BMI result if it exists
+
+      // If BMI result exists, set "JustForYou" as the default tab
+      if (hasResult) {
+        setSelectedLevel("JustForYou");
+      } else {
+        setSelectedLevel("Beginner"); // Default to Beginner if no BMI result
+      }
+    } catch (error) {
+      console.error("Error retrieving BMI result from AsyncStorage", error);
+    }
+  };
 
   const renderClasses = () => {
     switch (selectedLevel) {
@@ -54,19 +63,42 @@ const ExerciseMainPage = ({ onBMIClick }) => {
     }
   };
 
+  const handleBMIResultClick = () => {
+    setShowBMIDetails(true); // Show the BMI details
+  };
+
   return (
     <ScrollView className="flex-1 px-5 pt-10 bg-white">
       <View className="items-center">
         <Text className="text-3xl font-bold text-center">Exercises</Text>
 
-        <CustomButton
-          title={
-            hasBMIResult ? "Calculate BMI" : "Calculate BMI to Get Started"
-          } // Change button text based on BMI result
-          handlePress={onBMIClick}
-          containerStyles="w-full mt-4 bg-purple-500"
-          textStyle="text-white text-lg"
-        />
+        {!hasBMIResult && (
+          <CustomButton
+            title="Calculate BMI to Get Started"
+            handlePress={onBMIClick}
+            containerStyles="w-full mt-4 bg-purple-500"
+            textStyle="text-white text-lg"
+          />
+        )}
+
+        {hasBMIResult && (
+          <View className="flex-row justify-between mt-4">
+            <CustomButton
+              title="Calculate BMI"
+              handlePress={onBMIClick}
+              containerStyles="flex-1 bg-purple-500 rounded-xl p-2 mr-2"
+              textStyle="text-white text-lg text-center"
+            />
+            <TouchableOpacity
+              onPress={handleBMIResultClick}
+              className="p-2 rounded-xl w-1/3 border-2 border-secondary-100"
+            >
+              <Text className="text-secondary-100 font-bold text-base text-center my-auto">
+                BMI Results
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       <ScrollView
@@ -74,6 +106,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         showsHorizontalScrollIndicator={false}
         className="mt-6"
       >
+        {/* Conditionally render the "Just for You" tab */}
         {hasBMIResult && (
           <TouchableOpacity
             onPress={() => setSelectedLevel("JustForYou")}
@@ -170,6 +203,15 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           </Picker>
         </View>
       </View>
+
+      {/* BMI Details Modal */}
+      {showBMIDetails && (
+        <BMIDetails
+          visible={showBMIDetails}
+          onClose={() => setShowBMIDetails(false)}
+          onDelete={checkBMIResult} // Refresh after deletion
+        />
+      )}
 
       {renderClasses()}
     </ScrollView>

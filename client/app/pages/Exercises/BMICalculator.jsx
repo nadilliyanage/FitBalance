@@ -18,7 +18,7 @@ const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 const { width } = Dimensions.get("window");
 
 const BMICalculator = () => {
-  const [gender, setGender] = useState("male");
+  const [gender, setGender] = useState("Male");
   const [weight, setWeight] = useState("50");
   const [age, setAge] = useState("20");
   const [height, setHeight] = useState("100");
@@ -90,9 +90,9 @@ const BMICalculator = () => {
           </Text>
           <View className="flex-row justify-center mb-5">
             <TouchableOpacity
-              onPress={() => setGender("male")}
+              onPress={() => setGender("Male")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "male" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Male" ? "bg-purple-200" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -112,20 +112,20 @@ const BMICalculator = () => {
                 <FontAwesome5
                   name="mars"
                   size={18}
-                  color={gender === "male" ? "blue" : "gray"}
+                  color={gender === "Male" ? "blue" : "gray"}
                 />
               </View>
               <MaterialCommunityIcons
                 name="face-man"
                 size={40}
-                color={gender === "male" ? "blue" : "gray"}
+                color={gender === "Male" ? "blue" : "gray"}
               />
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setGender("female")}
+              onPress={() => setGender("Female")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "female" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Female" ? "bg-purple-200" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -145,13 +145,13 @@ const BMICalculator = () => {
                 <FontAwesome5
                   name="venus"
                   size={18}
-                  color={gender === "female" ? "red" : "gray"}
+                  color={gender === "Female" ? "red" : "gray"}
                 />
               </View>
               <MaterialCommunityIcons
                 name="face-woman"
                 size={40}
-                color={gender === "female" ? "red" : "gray"}
+                color={gender === "Female" ? "red" : "gray"}
               />
             </TouchableOpacity>
           </View>
