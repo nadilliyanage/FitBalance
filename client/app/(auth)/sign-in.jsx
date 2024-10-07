@@ -1,4 +1,3 @@
-// SignIn.js
 import { View, Image, Text, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,12 +36,23 @@ const SignIn = () => {
       });
       router.replace("/home"); // Adjust the path as needed
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error.message,
-      });
-      console.error("SignIn Error:", error.message);
+      // Check for specific error codes
+      if (error.code === "auth/invalid-credential") {
+        Toast.show({
+          type: "error",
+          text1: "Invalid Credential",
+          text2: "The email or password is incorrect.",
+        });
+      } else if (error.code === "auth/invalid-email") {
+        Toast.show({
+          type: "error",
+          text1: "Invalid Email",
+          text2: "The email address is not valid.",
+        });
+      } else {
+        // Optionally handle other errors (if necessary)
+        console.error("SignIn Error:", error.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
