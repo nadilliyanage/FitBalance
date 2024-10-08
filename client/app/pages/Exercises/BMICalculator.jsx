@@ -1,4 +1,4 @@
-import React, { useState, useCallback, lazy, Suspense } from "react";
+import React, { useState, useCallback, lazy, Suspense, useRef } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,10 @@ const BMICalculator = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [bmiResult, setBmiResult] = useState(null);
   const [back, setBack] = useState(false);
+
+  // Refs for holding buttons
+  const weightIntervalRef = useRef(null);
+  const ageIntervalRef = useRef(null);
 
   const handleScroll = useCallback((event) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
@@ -70,6 +74,31 @@ const BMICalculator = () => {
   }
 
   const pointerLeft = (parseInt(height) - 100) * 10 + width / 2 - 15;
+
+  // Start and stop functions for handling hold
+  const startChangingWeight = (delta) => {
+    if (weightIntervalRef.current) clearInterval(weightIntervalRef.current);
+
+    weightIntervalRef.current = setInterval(() => {
+      setWeight((prev) => Math.max(1, parseInt(prev) + delta).toString());
+    }, 100); // Faster speed on hold
+  };
+
+  const stopChangingWeight = () => {
+    if (weightIntervalRef.current) clearInterval(weightIntervalRef.current);
+  };
+
+  const startChangingAge = (delta) => {
+    if (ageIntervalRef.current) clearInterval(ageIntervalRef.current);
+
+    ageIntervalRef.current = setInterval(() => {
+      setAge((prev) => Math.max(1, parseInt(prev) + delta).toString());
+    }, 100); // Faster speed on hold
+  };
+
+  const stopChangingAge = () => {
+    if (ageIntervalRef.current) clearInterval(ageIntervalRef.current);
+  };
 
   return (
     <SafeAreaView className="bg-white flex-1">
@@ -170,17 +199,17 @@ const BMICalculator = () => {
               />
               <View className="flex-row mt-2">
                 <TouchableOpacity
-                  onPress={() =>
-                    setWeight((prev) => (parseInt(prev) - 1).toString())
-                  }
+                  onPressIn={() => startChangingWeight(-1)}
+                  onPressOut={stopChangingWeight}
+                  onPress={() => setWeight((prev) => Math.max(1, parseInt(prev) - 1).toString())} // Single decrease
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="minus" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() =>
-                    setWeight((prev) => (parseInt(prev) + 1).toString())
-                  }
+                  onPressIn={() => startChangingWeight(1)}
+                  onPressOut={stopChangingWeight}
+                  onPress={() => setWeight((prev) => (parseInt(prev) + 1).toString())} // Single increase
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="plus" size={20} />
@@ -198,17 +227,17 @@ const BMICalculator = () => {
               />
               <View className="flex-row mt-2">
                 <TouchableOpacity
-                  onPress={() =>
-                    setAge((prev) => (parseInt(prev) - 1).toString())
-                  }
+                  onPressIn={() => startChangingAge(-1)}
+                  onPressOut={stopChangingAge}
+                  onPress={() => setAge((prev) => Math.max(1, parseInt(prev) - 1).toString())} // Single decrease
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="minus" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() =>
-                    setAge((prev) => (parseInt(prev) + 1).toString())
-                  }
+                  onPressIn={() => startChangingAge(1)}
+                  onPressOut={stopChangingAge}
+                  onPress={() => setAge((prev) => (parseInt(prev) + 1).toString())} // Single increase
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="plus" size={20} />
@@ -274,8 +303,8 @@ const BMICalculator = () => {
           </View>
 
           <TouchableOpacity
+            className="bg-purple-600 rounded-lg py-4"
             onPress={calculateBMI}
-            className="bg-purple-500 py-4 rounded-lg"
           >
             <Text className="text-center text-white font-bold text-lg">
               Calculate BMI
@@ -284,12 +313,13 @@ const BMICalculator = () => {
         </View>
       </ScrollView>
 
-      {/* Use the BMIModal component */}
-      <BMIModal
-        visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-        bmiResult={bmiResult}
-      />
+      {/* Show the BMI modal */}
+      {isModalVisible && (
+        <BMIModal
+          bmiResult={bmiResult}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </SafeAreaView>
   );
 };

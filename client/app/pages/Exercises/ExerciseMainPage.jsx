@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Text,
+  FlatList,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -68,7 +69,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
   };
 
   return (
-    <ScrollView className="flex-1 px-5 pt-10 bg-white">
+    <View className="flex-1 px-5 pt-10 bg-white">
       <View className="items-center">
         <Text className="text-3xl font-bold text-center">Exercises</Text>
 
@@ -101,16 +102,17 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         )}
       </View>
 
+      {/* Tab selection */}
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        className="mt-6"
+        className="mt-6 h-16 flex"
       >
         {/* Conditionally render the "Just for You" tab */}
         {hasBMIResult && (
           <TouchableOpacity
             onPress={() => setSelectedLevel("JustForYou")}
-            className={`px-4 py-2 mx-2 rounded-full ${
+            className={`px-4 py-2 mx-2 rounded-full h-10 ${
               selectedLevel === "JustForYou"
                 ? "bg-purple-500"
                 : "bg-white border border-gray-400"
@@ -128,7 +130,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Beginner")}
-          className={`px-4 py-2 mx-2 rounded-full ${
+          className={`px-4 py-2 mx-2 rounded-full h-10 ${
             selectedLevel === "Beginner"
               ? "bg-purple-500"
               : "bg-white border border-gray-400"
@@ -145,7 +147,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Intermediate")}
-          className={`px-4 py-2 mx-2 rounded-full ${
+          className={`px-4 py-2 mx-2 rounded-full h-10 ${
             selectedLevel === "Intermediate"
               ? "bg-purple-500"
               : "bg-white border border-gray-400"
@@ -162,7 +164,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Advanced")}
-          className={`px-4 py-2 mx-2 rounded-full ${
+          className={`px-4 py-2 mx-2 rounded-full h-10 ${
             selectedLevel === "Advanced"
               ? "bg-purple-500"
               : "bg-white border border-gray-400"
@@ -178,6 +180,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Fixed search field and dropdown */}
       <View className="flex-row items-center mt-5">
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
@@ -213,8 +216,14 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         />
       )}
 
-      {renderClasses()}
-    </ScrollView>
+      {/* Use FlatList to render the class components */}
+      <FlatList
+        data={[selectedLevel]} // Use the selected level as a single data point
+        renderItem={() => renderClasses()} // Render classes based on the selected level
+        keyExtractor={(item) => item} // Simple key extractor
+        scrollEnabled={true} // Disable scrolling since we already have a ScrollView for the top content
+      />
+    </View>
   );
 };
 
