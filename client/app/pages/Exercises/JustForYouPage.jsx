@@ -170,7 +170,7 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   );
 
   return (
-    <View className="flex-1 justify-center items-center bg-white pb-5">
+    <View className="flex-1 justify-center items-center bg-white">
       {/* Progress Tracker */}
       <View className="p-4 bg-purple-400 rounded-xl w-full flex-row justify-between items-center mb-2">
         <Text className="text-lg font-semibold text-white">

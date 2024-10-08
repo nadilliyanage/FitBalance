@@ -23,20 +23,25 @@ const ClassDetailsModal = ({
   const [progress, setProgress] = useState(0); // Track progress
   const [countdownActive, setCountdownActive] = useState(false); // Track countdown state
 
+  // Load progress from AsyncStorage when the modal is visible
   useEffect(() => {
     const loadProgress = async () => {
-      try {
-        const savedProgress = await AsyncStorage.getItem("userProgress");
-        if (savedProgress !== null) {
-          setProgress(JSON.parse(savedProgress));
+      if (isVisible) {
+        try {
+          const savedProgress = await AsyncStorage.getItem("userProgress");
+          if (savedProgress !== null) {
+            setProgress(JSON.parse(savedProgress));
+          } else {
+            setProgress(0); // Reset progress if nothing is saved
+          }
+        } catch (error) {
+          console.error("Error loading progress", error);
         }
-      } catch (error) {
-        console.error("Error loading progress", error);
       }
     };
 
     loadProgress();
-  }, []);
+  }, [isVisible]);
 
   useEffect(() => {
     let timer;
@@ -214,21 +219,18 @@ const ClassDetailsModal = ({
         <ScrollView className="flex-1">{renderTabContent()}</ScrollView>
 
         <View className="p-4">
-          <Text className="text-lg font-semibold text-gray-800 mb-2">
-            Countdown: {Math.floor(remainingTime / 60)}:{remainingTime % 60 < 10 ? `0${remainingTime % 60}` : remainingTime % 60}
-          </Text>
-          <Text className="text-lg font-semibold text-gray-800 mb-2">
-            Progress: {progress} {/* Display progress */}
+          <Text className="text-xl font-semibold text-gray-800 mb-2 text-center">
+            Time: <Text className="text-3xl">{Math.floor(remainingTime / 60)}:{remainingTime % 60 < 10 ? `0${remainingTime % 60}` : remainingTime % 60}</Text>
           </Text>
         </View>
 
         {/* Start Now Button */}
         <View className="p-4">
           <TouchableOpacity
-            className="bg-purple-600 rounded-lg py-3"
-            onPress={handleStartClass} // Start the class and initiate the countdown
+            className="bg-secondary-100 p-3 rounded-lg"
+            onPress={handleStartClass}
           >
-            <Text className="text-white text-center text-lg font-bold">Start Now</Text>
+            <Text className="text-white text-2xl text-center font-bold">Start Now</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -238,7 +240,22 @@ const ClassDetailsModal = ({
 
 ClassDetailsModal.propTypes = {
   isVisible: PropTypes.bool.isRequired,
-  // classDetails: PropTypes.object.isRequired,
+  // classDetails: PropTypes.shape({
+  //   Name: PropTypes.string.isRequired,
+  //   instructor: PropTypes.string.isRequired,
+  //   description: PropTypes.string.isRequired,
+  //   prerequisites: PropTypes.string,
+  //   additionalBenefits: PropTypes.string,
+  //   duration: PropTypes.number.isRequired,
+  //   equipmentNeeded: PropTypes.string,
+  //   reviews: PropTypes.arrayOf(
+  //     PropTypes.shape({
+  //       reviewer: PropTypes.string.isRequired,
+  //       comment: PropTypes.string.isRequired,
+  //     })
+  //   ),
+  //   image: PropTypes.node.isRequired,
+  // }).isRequired,
   onClose: PropTypes.func.isRequired,
   onStartClass: PropTypes.func.isRequired,
 };
