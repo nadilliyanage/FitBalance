@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, lazy, useState, Suspense } from "react";
 import { View, Text, TouchableOpacity, Modal, Animated } from "react-native";
 import { BlurView } from "expo-blur";
-import Icon from 'react-native-vector-icons/FontAwesome'; // Ensure this library is installed
+import Icon from "react-native-vector-icons/FontAwesome"; // Ensure this library is installed
 
 const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 
@@ -42,29 +42,33 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
   const getCategoryColor = (category) => {
     switch (category) {
       case "Underweight":
-        return "#007bff"; // Blue
+        return "text-blue-500";
       case "Normal weight":
-        return "#28a745"; // Green
+        return "text-green-600";
       case "Overweight":
-        return "#ffc107"; // Yellow
+        return "text-yellow-500";
       case "Obesity":
-        return "#dc3545"; // Red
+        return "text-red-600";
       default:
-        return "#ffffff"; // Default to white
+        return "text-white";
     }
   };
 
   // Function to get chat bubble style
   const getChatBubbleStyle = (category) => {
-    return {
-      padding: 10,
-      borderRadius: 8,
-      backgroundColor: getCategoryColor(category),
-      borderColor: getCategoryColor(category),
-      borderWidth: 1,
-      position: "relative",
-      marginTop: 10, // Adjusted to ensure space below BMI value
-    };
+    const baseStyles = "p-3 rounded-lg";
+    switch (category) {
+      case "Underweight":
+        return `${baseStyles} bg-blue-500`;
+      case "Normal weight":
+        return `${baseStyles} bg-green-600`;
+      case "Overweight":
+        return `${baseStyles} bg-yellow-500`;
+      case "Obesity":
+        return `${baseStyles} bg-red-600`;
+      default:
+        return `${baseStyles} bg-white`;
+    }
   };
 
   // Function to calculate the healthy weight range
@@ -74,11 +78,16 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
     // Calculate weight range based on BMI values of 18.5 to 24.9
     const minWeight = 18.5 * heightInMeters * heightInMeters;
     const maxWeight = 24.9 * heightInMeters * heightInMeters;
-    return { minWeight: Math.round(minWeight), maxWeight: Math.round(maxWeight) };
+    return {
+      minWeight: Math.round(minWeight),
+      maxWeight: Math.round(maxWeight),
+    };
   };
 
   // Determine the BMI category and color
-  const bmiCategory = bmiResult ? getBMICategory(parseFloat(bmiResult.bmi)) : "";
+  const bmiCategory = bmiResult
+    ? getBMICategory(parseFloat(bmiResult.bmi))
+    : "";
   const chatBubbleStyle = getChatBubbleStyle(bmiCategory);
 
   // Message based on BMI category
@@ -93,11 +102,10 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
       "You are in the obesity range. It's important to consult with a healthcare provider for advice.",
   };
 
-  // Determine the font color for the BMI value
-  const bmiFontColor = getCategoryColor(bmiCategory);
-
   // Calculate healthy weight range
-  const healthyWeightRange = bmiResult ? calculateHealthyWeightRange(bmiResult.height) : { minWeight: 0, maxWeight: 0 };
+  const healthyWeightRange = bmiResult
+    ? calculateHealthyWeightRange(bmiResult.height)
+    : { minWeight: 0, maxWeight: 0 };
 
   // Navigation function
   const handleNavigate = () => {
@@ -122,114 +130,72 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
       <BlurView
         tint="light"
         intensity={100}
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        className="flex-1 justify-center items-center"
       >
-        <View
-          style={{
-            backgroundColor: "white",
-            padding: 16,
-            borderRadius: 8,
-            width: 320,
-            position: 'relative', // Ensure chat bubble is positioned relative to the modal content
-          }}
-        >
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 24,
-              fontWeight: "bold",
-              marginBottom: 16,
-            }}
-          >
-            Your BMI:
-          </Text>
+        <View className="bg-white p-4 rounded-2xl w-80 shadow-2xl shadow-black">
+          <Text className="text-center text-2xl font-bold mb-4">Your BMI:</Text>
           {bmiResult && (
             <View>
               <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 48,
-                  fontWeight: "bold",
-                  marginBottom: 8,
-                  color: bmiFontColor, // Set the BMI font color based on category
-                }}
+                className={`text-center text-6xl font-bold mb-2 ${getCategoryColor(
+                  bmiCategory
+                )}`}
               >
                 {bmiResult.bmi}
               </Text>
 
               {/* BMI Category Message */}
-              <View style={{ position: "relative", marginBottom: 16 }}>
-                <View style={chatBubbleStyle}>
-                  <Text style={{ color: "white", textAlign: "center" }}>
+              <View className="relative mb-4">
+                <View className={chatBubbleStyle}>
+                  <Text className="text-white text-center">
                     {categoryMessage[bmiCategory]}
                   </Text>
-                </View>
-
-                {/* BMI Category Bar */}
-                <View style={{ marginTop: 20 }}>
-                  <View style={{ height: 10, flexDirection: "row" }}>
-                    <View style={{ flex: 1, backgroundColor: "#007bff" }} />
-                    <View style={{ flex: 2, backgroundColor: "#28a745" }} />
-                    <View style={{ flex: 1, backgroundColor: "#ffc107" }} />
-                    <View style={{ flex: 2, backgroundColor: "#dc3545" }} />
-                  </View>
                 </View>
               </View>
 
               {/* Display weight and height on the left side, age and gender on the right */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ textAlign: "left", fontSize: 18, marginBottom: 8 }}>
-                    Weight: {bmiResult.weight} kg
+              <View className="flex-row justify-between mb-4">
+                <View className="flex-1">
+                  <Text className="text-left text-lg mb-2">
+                    Weight:{" "}
+                    <Text className="font-bold"> {bmiResult.weight} kg</Text>
                   </Text>
-                  <Text style={{ textAlign: "left", fontSize: 18, marginBottom: 8 }}>
-                    Height: {bmiResult.height} cm
+                  <Text className="text-left text-lg mb-2">
+                    Height:{" "}
+                    <Text className="font-bold">{bmiResult.height} cm</Text>
                   </Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ textAlign: "right", fontSize: 18, marginBottom: 8 }}>
-                    Age: {bmiResult.age} years
+                <View className="flex-1">
+                  <Text className="text-right text-lg mb-2">
+                    Age:{" "}
+                    <Text className="font-bold">{bmiResult.age} years</Text>
                   </Text>
-                  <Text style={{ textAlign: "right", fontSize: 18 }}>
-                    Gender: {bmiResult.gender}
+                  <Text className="text-right text-lg">
+                    Gender:{" "}
+                    <Text className="font-bold">{bmiResult.gender}</Text>
                   </Text>
                 </View>
               </View>
 
               {/* Healthy Weight Range */}
-              <View style={{ marginBottom: 8}}>
-                <Text style={{ textAlign: "center", fontSize: 18, marginBottom: 8, fontWeight: '600' }}>
+              <View className="mb-2">
+                <Text className="text-center text-lg mb-2 font-semibold">
                   Healthy Weight Range for Your Height:
                 </Text>
-                <Text style={{ textAlign: "center", fontSize: 22, fontWeight: 'bold' }}>
-                  {healthyWeightRange.minWeight} - {healthyWeightRange.maxWeight} kg
+                <Text className="text-center text-2xl font-bold">
+                  {healthyWeightRange.minWeight} -{" "}
+                  {healthyWeightRange.maxWeight} kg
                 </Text>
               </View>
-
             </View>
           )}
 
           {/* Navigate Button */}
           <TouchableOpacity
             onPress={() => setBack(true)}
-            style={{
-              backgroundColor: "#28a745",
-              paddingVertical: 8,
-              borderRadius: 8,
-              marginTop: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
+            className="bg-green-600 py-2 rounded-lg mt-4 flex-row items-center justify-center"
           >
-            <Text
-              style={{
-                color: "white",
-                fontWeight: "bold",
-                fontSize: 18,
-                marginRight: 8
-              }}
-            >
+            <Text className="text-white font-bold text-lg mr-2">
               Let's Start Journey
             </Text>
             <Animated.View style={{ transform: [{ translateX: moveValue }] }}>
@@ -240,21 +206,9 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
           {/* Close Button */}
           <TouchableOpacity
             onPress={onClose}
-            style={{
-              backgroundColor: "#6a0dad",
-              paddingVertical: 8,
-              borderRadius: 8,
-              marginTop: 16,
-            }}
+            className="bg-purple-700 py-2 rounded-lg mt-4"
           >
-            <Text
-              style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: 18,
-              }}
-            >
+            <Text className="text-center text-white font-bold text-lg">
               Close
             </Text>
           </TouchableOpacity>

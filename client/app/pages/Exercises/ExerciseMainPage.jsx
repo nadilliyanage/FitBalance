@@ -181,7 +181,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
       </ScrollView>
 
       {/* Fixed search field and dropdown */}
-      <View className="flex-row items-center mt-5">
+      <View className="flex-row items-center mt-5 mb-2">
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
           <TextInput
@@ -195,7 +195,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           </TouchableOpacity>
         </View>
 
-        <View className="ml-3 mr-[-10]" style={{ width: 150 }}>
+        <View className="ml-3 mr-[-10]" style={{ width: 160 }}>
           <Picker
             selectedValue={searchBy}
             style={{ height: 30, width: "100%" }}

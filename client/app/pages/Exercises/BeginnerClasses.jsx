@@ -7,6 +7,8 @@ import ClassDetailsModal from "../../../components/ClassDetailsModal";
 const BeginnerClasses = ({ filterText = "", searchBy = "" }) => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [countdownInterval, setCountdownInterval] = useState(null);
+  const [duration, setDuration] = useState(0); 
 
   const filteredClasses = classes.Beginner.filter((classItem) => {
     const searchKey = searchBy === "Name" ? "Name" : "instructor";
@@ -20,13 +22,38 @@ const BeginnerClasses = ({ filterText = "", searchBy = "" }) => {
     setModalVisible(true);
   };
 
+  const handleStartClass = async (classDuration, className) => {
+    setDuration(classDuration);
+    setModalVisible(false);
+    startCountdown(classDuration, className);
+  };
+
+  const startCountdown = (duration) => {
+    let timeLeft = duration;
+  
+    const interval = setInterval(async () => {
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+      } else {
+        timeLeft -= 1; // Decrease the timer
+      }
+    }, 1000); // Update every second
+  
+    setCountdownInterval(interval); // Store interval ID for cleanup
+  };
+
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedClass(null);
+    // Clear the countdown if a class is not started
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      setCountdownInterval(null); // Reset countdown interval
+    }
   };
 
   return (
-    <View style={{ marginTop: 16 }}>
+    <View style={{ marginTop: 5 }}>
       {filteredClasses.length > 0 ? (
         filteredClasses.map((classItem) => (
           <ClassCard
@@ -50,6 +77,7 @@ const BeginnerClasses = ({ filterText = "", searchBy = "" }) => {
         isVisible={isModalVisible}
         classDetails={selectedClass}
         onClose={handleCloseModal}
+        onStartClass={handleStartClass}
       />
     </View>
   );

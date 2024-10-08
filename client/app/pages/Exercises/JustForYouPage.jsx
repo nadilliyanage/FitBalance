@@ -1,15 +1,79 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Alert } from "react-native";
+import { View, Text, FlatList, Alert, Button, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ClassCard from "../../../components/ClassCard";
 import ClassDetailsModal from "../../../components/ClassDetailsModal"; // Import the ClassDetailsModal
 import { classes } from "../../data/classes";
+import { Feather } from '@expo/vector-icons';
 
 const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   const [bmiResult, setBmiResult] = useState(null);
   const [justForYouClasses, setJustForYouClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null); // State for selected class
   const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [countdownInterval, setCountdownInterval] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0); // Duration in seconds
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      const storedProgress = await AsyncStorage.getItem("userProgress");
+      if (storedProgress) {
+        setProgress(JSON.parse(storedProgress));
+      }
+    };
+
+    fetchProgress();
+
+    // Cleanup the interval if the component unmounts
+    return () => {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+    };
+  }, []);
+
+  const refreshProgress = async () => {
+    const storedProgress = await AsyncStorage.getItem("userProgress");
+    if (storedProgress) {
+      setProgress(JSON.parse(storedProgress));
+    }
+  };
+
+  const handleStartClass = async (classDuration, className) => {
+    const completedClasses = JSON.parse(await AsyncStorage.getItem("completedClasses")) || [];
+    
+    // Check if the class has already been completed
+    if (completedClasses.includes(className)) {
+      Alert.alert("Class Already Completed", "You have already completed this class.");
+      setModalVisible(false);
+      return; // Exit if the class is already completed
+    }
+  
+    setDuration(classDuration);
+    setModalVisible(false);
+    startCountdown(classDuration, className); // Pass className to the countdown
+    refreshProgress();
+  };
+
+  const startCountdown = (duration) => {
+    let timeLeft = duration;
+  
+    const interval = setInterval(async () => {
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        setProgress((prevProgress) => {
+          const newProgress = prevProgress + 1; // Increase progress
+          AsyncStorage.setItem("userProgress", JSON.stringify(newProgress)); // Ensure consistent key
+          return newProgress;
+        });
+      } else {
+        timeLeft -= 1; // Decrease the timer
+      }
+    }, 1000); // Update every second
+  
+    setCountdownInterval(interval); // Store interval ID for cleanup
+  };
 
   useEffect(() => {
     const fetchBMIDetails = async () => {
@@ -61,6 +125,36 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedClass(null);
+    // Clear the countdown if a class is not started
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      setCountdownInterval(null); // Reset countdown interval
+    }
+  };
+
+  const handleDeleteProgress = async () => {
+    Alert.alert(
+      "Confirm Reset",
+      "Are you sure you want to reset your progress?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Reset",
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem("userProgress");
+              setProgress(0);
+            } catch (error) {
+              console.error("Error deleting BMI results:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const renderClassItem = ({ item }) => (
@@ -76,7 +170,18 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   );
 
   return (
-    <View className="flex-1 justify-center items-center bg-white py-5">
+    <View className="flex-1 justify-center items-center bg-white pb-5">
+      {/* Progress Tracker */}
+      <View className="p-4 bg-gray-200 w-full flex-row justify-between items-center">
+        <Text className="text-lg font-semibold">
+          Progress: {progress} Class(es) Completed
+        </Text>
+        <TouchableOpacity onPress={handleDeleteProgress} className="bg-white rounded-full p-2 w-auto items-center justify-center">
+        <Feather name="trash" size={18} color="red" />
+        </TouchableOpacity>
+
+      </View>
+
       <Text className="text-xl font-bold mb-5">Classes Just For You</Text>
       {bmiResult && filteredClasses.length > 0 ? (
         <FlatList
@@ -92,7 +197,8 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
       <ClassDetailsModal
         isVisible={isModalVisible}
         classDetails={selectedClass}
-        onClose={handleCloseModal} // Pass the close function
+        onClose={handleCloseModal}
+        onStartClass={handleStartClass} // Pass the function to start the class
       />
     </View>
   );
