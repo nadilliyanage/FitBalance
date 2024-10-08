@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import BMIModal from "./BMIModal"; // Import the BMIModal component
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BMIMeaning from "./BMIMeaningModal";
 
 const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 
@@ -25,6 +26,7 @@ const BMICalculator = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [bmiResult, setBmiResult] = useState(null);
   const [back, setBack] = useState(false);
+  const [isMeaningVisible, setMeaningVisible] = useState(false);
 
   // Refs for holding buttons
   const weightIntervalRef = useRef(null);
@@ -112,6 +114,12 @@ const BMICalculator = () => {
               <FontAwesome5 name="arrow-left" size={20} color="purple" />
             </TouchableOpacity>
             <Text className="text-xl font-bold">BMI Calculator</Text>
+            <TouchableOpacity
+              style={{ position: "absolute", right: 10 }}
+              onPress={() => setMeaningVisible(true)}
+            >
+              <FontAwesome5 name="question-circle" size={20} color="purple" />
+            </TouchableOpacity>
           </View>
 
           <Text className="text-lg font-semibold mb-3">
@@ -121,7 +129,7 @@ const BMICalculator = () => {
             <TouchableOpacity
               onPress={() => setGender("Male")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "Male" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Male" ? "bg-purple-200 border-4 border-secondary-300" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -154,7 +162,7 @@ const BMICalculator = () => {
             <TouchableOpacity
               onPress={() => setGender("Female")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "Female" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Female" ? "bg-purple-200 border-4 border-secondary-300" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -188,7 +196,7 @@ const BMICalculator = () => {
           <Text className="text-lg font-semibold mb-3">
             Please Modify the values
           </Text>
-          <View className="flex-row justify-between mb-5">
+          <View className="flex-row justify-around mb-5">
             <View className="items-center bg-purple-200 w-36 py-5 rounded-lg">
               <Text className="text-lg font-semibold mb-2">Weight (kg)</Text>
               <TextInput
@@ -320,6 +328,7 @@ const BMICalculator = () => {
           onClose={() => setModalVisible(false)}
         />
       )}
+      <BMIMeaning isVisible={isMeaningVisible} onClose={() => setMeaningVisible(false)} />
     </SafeAreaView>
   );
 };

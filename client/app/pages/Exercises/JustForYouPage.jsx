@@ -172,8 +172,8 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   return (
     <View className="flex-1 justify-center items-center bg-white pb-5">
       {/* Progress Tracker */}
-      <View className="p-4 bg-gray-200 w-full flex-row justify-between items-center">
-        <Text className="text-lg font-semibold">
+      <View className="p-4 bg-purple-400 rounded-xl w-full flex-row justify-between items-center mb-2">
+        <Text className="text-lg font-semibold text-white">
           Progress: {progress} Class(es) Completed
         </Text>
         <TouchableOpacity onPress={handleDeleteProgress} className="bg-white rounded-full p-2 w-auto items-center justify-center">
