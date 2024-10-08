@@ -1,8 +1,9 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { View, Text, TextInput, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const LazyNutrition = lazy(() => import("../../(tabs)/Nutrition"));
 
@@ -60,15 +61,15 @@ const NutritionCalculator = () => {
   };
 
   const getLackingNutrients = (totalNutrition) => {
-    const lackingNutrients = [];
+    const lackingNutrients = {};
     if (totalNutrition.calories < DAILY_NUTRIENT_REQUIREMENTS.calories)
-      lackingNutrients.push({ name: 'Calories', value: DAILY_NUTRIENT_REQUIREMENTS.calories - totalNutrition.calories });
+      lackingNutrients.calories = DAILY_NUTRIENT_REQUIREMENTS.calories - totalNutrition.calories;
     if (totalNutrition.protein < DAILY_NUTRIENT_REQUIREMENTS.protein)
-      lackingNutrients.push({ name: 'Protein', value: DAILY_NUTRIENT_REQUIREMENTS.protein - totalNutrition.protein });
+      lackingNutrients.protein = DAILY_NUTRIENT_REQUIREMENTS.protein - totalNutrition.protein;
     if (totalNutrition.carbs < DAILY_NUTRIENT_REQUIREMENTS.carbs)
-      lackingNutrients.push({ name: 'Carbs', value: DAILY_NUTRIENT_REQUIREMENTS.carbs - totalNutrition.carbs });
+      lackingNutrients.carbs = DAILY_NUTRIENT_REQUIREMENTS.carbs - totalNutrition.carbs;
     if (totalNutrition.fat < DAILY_NUTRIENT_REQUIREMENTS.fat)
-      lackingNutrients.push({ name: 'Fat', value: DAILY_NUTRIENT_REQUIREMENTS.fat - totalNutrition.fat });
+      lackingNutrients.fat = DAILY_NUTRIENT_REQUIREMENTS.fat - totalNutrition.fat;
     return lackingNutrients;
   };
 
@@ -84,61 +85,65 @@ const NutritionCalculator = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100 p-4">
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
-        {/* Back Button */}
-        <TouchableOpacity
-          className="absolute top-10 left-4 z-10 p-2 bg-purple-200 rounded"
-          onPress={() => setBack(true)}
-        >
-          <Text className="text-lg font-bold text-purple-700">
-            Back to Nutrition
-          </Text>
-        </TouchableOpacity>
-
-        {/* App Title */}
-        <Text className="text-3xl font-bold text-purple-900 mb-4 text-center">Nutrition Calculator</Text>
-
-        {/* Food Picker */}
-        <View className="bg-white shadow-md rounded p-4 mb-4">
-          <Text className="text-lg font-bold text-gray-700 mb-2">Select Food:</Text>
-          <Picker
-            selectedValue={selectedFood}
-            style={{ height: 50, width: '100%' }}
-            onValueChange={(itemValue) => setSelectedFood(itemValue)}
+    <SafeAreaView className="bg-white flex-1 pt-4 px-4">
+      {/* <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
+         */}
+        <View className="flex-row items-center justify-center mb-5">
+          {/* Back Button */}
+          <TouchableOpacity
+            style={{ position: "absolute", left: 10 }}
+            onPress={() => setBack(true)}
           >
-            {COMMON_FOODS.map((food, index) => (
-              <Picker.Item key={index} label={food.name} value={food.name} />
-            ))}
-          </Picker>
+            <FontAwesome5 name="arrow-left" size={20} color="purple" />
+          </TouchableOpacity>
+          <Text className="text-xl font-bold">Nutrition Calculator</Text>
         </View>
 
-        {/* Weight Input */}
-        <View className="bg-white shadow-md rounded p-4 mb-4">
-          <Text className="text-lg font-bold text-gray-700 mb-2">Enter Weight (g):</Text>
-          <TextInput
-            className="border border-gray-300 rounded p-2 text-lg w-full"
-            keyboardType="numeric"
-            value={weight}
-            onChangeText={setWeight}
-          />
+        {/* Food Picker and Weight Input in the same row */}
+        <View className="flex-row items-center justify-between bg-white shadow-md rounded p-4 mb-4">
+          <View style={{ flex: 1, marginRight: 10 }}>
+            <Text className="text-lg font-bold text-gray-700 mb-2">Select Food:</Text>
+            <Picker
+              selectedValue={selectedFood}
+              style={{ height: 50, width: '100%' }}
+              onValueChange={(itemValue) => setSelectedFood(itemValue)}
+            >
+              {COMMON_FOODS.map((food, index) => (
+                <Picker.Item key={index} label={food.name} value={food.name} />
+              ))}
+            </Picker>
+          </View>
+
+          <View style={{ flex: 0.6 }}>
+            <Text className="text-lg font-bold text-gray-700 mb-2">Enter Weight</Text>
+            <View className ="flex flex-row"> 
+            <TextInput
+              className="border border-gray-300 rounded p-2 text-lg w-full"
+              keyboardType="numeric"
+              value={weight}
+              onChangeText={setWeight}
+            />
+            <Text className="text-lg font-bold text-gray-700 mb-2">g</Text>
+          </View>
+          </View>
         </View>
 
         {/* Add Food Button */}
-        <TouchableOpacity
-          onPress={addFood}
-          className="bg-purple-700 rounded p-4 mb-4"
-        >
-          <Text className="text-white text-center text-lg font-bold">Add Food</Text>
-        </TouchableOpacity>
+        {/* Add Food Button */}
+<TouchableOpacity
+  onPress={addFood}
+  style={{ backgroundColor: '#9b59b6', padding: 15, borderRadius: 10, marginBottom: 20 }} // Added marginBottom for spacing
+>
+  <Text className="text-white text-center text-lg font-bold">Add Food</Text>
+</TouchableOpacity>
 
-        {/* List of Added Foods */}
+
+
+        {/* List of Added Foods (Scroll List with minimum 2 items shown) */}
         <Text className="text-2xl font-bold text-gray-800 mb-2">Added Foods:</Text>
-        <FlatList
-          data={addedFoods}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => (
-            <View className="flex-row justify-between items-center bg-white p-4 shadow-md rounded mb-2">
+        <ScrollView style={{ maxHeight: 250 }} showsVerticalScrollIndicator={true}>
+          {addedFoods.map((item, index) => (
+            <View key={index} className="flex-row justify-between items-center bg-white p-4 shadow-md rounded mb-2">
               <Text className="text-lg text-gray-700">{item.name} - {item.weight}g</Text>
               <View className="flex-row items-center">
                 <TextInput
@@ -155,56 +160,58 @@ const NutritionCalculator = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          )}
-          scrollEnabled={false}  /* Fix: Disable internal scrolling */
-        />
+          ))}
+        </ScrollView>
 
         {/* Nutritional Summary */}
         <View className="bg-white shadow-md rounded p-4 mt-4">
           <Text className="text-xl font-bold text-gray-800">Nutritional Summary:</Text>
+          
+          {/* Calories */}
           <View className="flex-row justify-between items-center">
             <Text className="text-lg text-gray-600">Calories:</Text>
             <Text className={`text-lg font-bold ${totalNutrition.calories >= DAILY_NUTRIENT_REQUIREMENTS.calories ? 'text-green-600' : 'text-red-600'}`}>
               {totalNutrition.calories.toFixed(2)} / {DAILY_NUTRIENT_REQUIREMENTS.calories}
             </Text>
           </View>
-          <View className="flex-row justify-between items-center">
+          {lackingNutrients.calories && (
+            <Text className="text-red-500 text-sm">Lacking: {lackingNutrients.calories.toFixed(2)} kcal</Text>
+          )}
+
+          {/* Protein */}
+          <View className="flex-row justify-between items-center mt-2">
             <Text className="text-lg text-gray-600">Protein:</Text>
             <Text className={`text-lg font-bold ${totalNutrition.protein >= DAILY_NUTRIENT_REQUIREMENTS.protein ? 'text-green-600' : 'text-red-600'}`}>
               {totalNutrition.protein.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.protein}g
             </Text>
           </View>
-          <View className="flex-row justify-between items-center">
+          {lackingNutrients.protein && (
+            <Text className="text-red-500 text-sm">Lacking: {lackingNutrients.protein.toFixed(2)}g</Text>
+          )}
+
+          {/* Carbs */}
+          <View className="flex-row justify-between items-center mt-2">
             <Text className="text-lg text-gray-600">Carbs:</Text>
             <Text className={`text-lg font-bold ${totalNutrition.carbs >= DAILY_NUTRIENT_REQUIREMENTS.carbs ? 'text-green-600' : 'text-red-600'}`}>
               {totalNutrition.carbs.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.carbs}g
             </Text>
           </View>
-          <View className="flex-row justify-between items-center">
+          {lackingNutrients.carbs && (
+            <Text className="text-red-500 text-sm">Lacking: {lackingNutrients.carbs.toFixed(2)}g</Text>
+          )}
+
+          {/* Fat */}
+          <View className="flex-row justify-between items-center mt-2">
             <Text className="text-lg text-gray-600">Fat:</Text>
             <Text className={`text-lg font-bold ${totalNutrition.fat >= DAILY_NUTRIENT_REQUIREMENTS.fat ? 'text-green-600' : 'text-red-600'}`}>
               {totalNutrition.fat.toFixed(2)}g / {DAILY_NUTRIENT_REQUIREMENTS.fat}g
             </Text>
           </View>
-        </View>
-
-        {/* Lacking Nutrients as Summary */}
-        <View className="bg-yellow-100 shadow-md rounded p-4 mt-4">
-          <Text className="text-xl font-bold text-yellow-900">Lacking Nutrients:</Text>
-          {lackingNutrients.length > 0 ? (
-            <View>
-              {lackingNutrients.map((nutrient, index) => (
-                <View key={index} className="flex-row justify-between items-center">
-                  <Text className="text-lg text-yellow-800">{nutrient.name}:</Text>
-                  <Text className="text-lg font-bold text-yellow-800">{nutrient.value.toFixed(2)}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text className="text-lg text-green-600">None</Text>
+          {lackingNutrients.fat && (
+            <Text className="text-red-500 text-sm">Lacking: {lackingNutrients.fat.toFixed(2)}g</Text>
           )}
         </View>
-      </ScrollView>
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
