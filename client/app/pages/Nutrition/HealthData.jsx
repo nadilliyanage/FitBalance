@@ -138,6 +138,54 @@ const HealthData = () => {
       </Suspense>
     );
   }
+  const getHealthComment = () => {
+    let comment = "Health Assessment: ";
+  
+    // Example criteria for comments
+    if (submittedData.hemoglobinRange === "below-12") {
+      comment += "Hemoglobin level is low. Consider consulting a doctor.";
+    } else if (submittedData.hemoglobinRange === "above-16") {
+      comment += "Hemoglobin level is high. Monitor your diet.";
+    } else {
+      comment += "Hemoglobin level is normal.";
+    }
+  
+    if (submittedData.bloodSugarRange === "above-125") {
+      comment += " Blood sugar level is high. Consider dietary adjustments.";
+    } else if (submittedData.bloodSugarRange === "100-125") {
+      comment += " Blood sugar level is borderline. Monitor closely.";
+    } else {
+      comment += " Blood sugar level is normal.";
+    }
+  
+    if (submittedData.totalCholesterolRange === "240+") {
+      comment += " Total cholesterol is high. Consult a healthcare professional.";
+    } else if (submittedData.totalCholesterolRange === "200-239") {
+      comment += " Total cholesterol is borderline high.";
+    } else {
+      comment += " Total cholesterol is normal.";
+    }
+  
+    if (submittedData.hdlRange === "below-40") {
+      comment += " HDL cholesterol is low. Consider lifestyle changes.";
+    } else if (submittedData.hdlRange === "above-60") {
+      comment += " HDL cholesterol is good.";
+    }
+  
+    if (submittedData.ldlRange === "above-129") {
+      comment += " LDL cholesterol is high. Consider consulting a doctor.";
+    } else if (submittedData.ldlRange === "100-129") {
+      comment += " LDL cholesterol is borderline high.";
+    }
+  
+    if (submittedData.triglyceridesRange === "200+") {
+      comment += " Triglycerides level is high. Monitor your diet.";
+    } else if (submittedData.triglyceridesRange === "150-199") {
+      comment += " Triglycerides level is borderline high.";
+    }
+  
+    return comment;
+  };
 
   return (
     <SafeAreaView className="bg-white flex-1 px-2">
@@ -162,6 +210,10 @@ const HealthData = () => {
           <Text className="mb-6 text-xl ml-4 font-bold">LDL Cholesterol:  {submittedData.ldlRange}</Text>
           <Text className="mb-6 text-xl ml-4 font-bold">Triglycerides:  {submittedData.triglyceridesRange}</Text>
 
+          <View className="absolute inset-x-0 bottom-0 mx-4">
+            <Text className="text-lg font-bold mb-2">{getHealthComment()}</Text>
+          </View>
+          
         <View className="absolute inset-x-0 bottom-0 mx-4 ">
           <TouchableOpacity onPress={() => setModalVisible(true)} className="bg-yellow-500 p-4 rounded-xl mb-2">
             <Text className="text-white text-center text-lg">Edit Health Data</Text>
