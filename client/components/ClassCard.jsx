@@ -71,7 +71,7 @@ const ClassCard = ({
         </View>
         <Text style={{ color: "#374151", marginTop: 8 }}>{description}</Text>
         <Text style={{ color: "#6B7280", marginTop: 8 }}>
-          Duration: {duration}
+          Duration: {duration} seconds
         </Text>
       </View>
     </TouchableOpacity>
