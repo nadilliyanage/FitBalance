@@ -1,4 +1,4 @@
-import React, { useState, useCallback, lazy, Suspense } from "react";
+import React, { useState, useCallback, lazy, Suspense, useRef } from "react";
 import {
   View,
   Text,
@@ -11,19 +11,26 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import BMIModal from "./BMIModal"; // Import the BMIModal component
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import BMIMeaning from "./BMIMeaningModal";
 
 const LazyExercices = lazy(() => import("../../(tabs)/Exercises"));
 
 const { width } = Dimensions.get("window");
 
 const BMICalculator = () => {
-  const [gender, setGender] = useState("male");
+  const [gender, setGender] = useState("Male");
   const [weight, setWeight] = useState("50");
   const [age, setAge] = useState("20");
   const [height, setHeight] = useState("100");
   const [isModalVisible, setModalVisible] = useState(false);
   const [bmiResult, setBmiResult] = useState(null);
   const [back, setBack] = useState(false);
+  const [isMeaningVisible, setMeaningVisible] = useState(false);
+
+  // Refs for holding buttons
+  const weightIntervalRef = useRef(null);
+  const ageIntervalRef = useRef(null);
 
   const handleScroll = useCallback((event) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
@@ -34,19 +41,27 @@ const BMICalculator = () => {
     setHeight(newHeight.toString());
   }, []);
 
-  const calculateBMI = () => {
+  const calculateBMI = async () => {
     const weightNum = parseFloat(weight);
     const heightNum = parseFloat(height) / 100;
     if (weightNum > 0 && heightNum > 0) {
       const bmi = (weightNum / (heightNum * heightNum)).toFixed(1);
-      setBmiResult({
+      const bmiDetails = {
         bmi,
         weight: weightNum,
         height,
         age,
         gender,
-      });
-      setModalVisible(true);
+      };
+  
+      try {
+        // Store the BMI details in AsyncStorage
+        await AsyncStorage.setItem('bmiResult', JSON.stringify(bmiDetails));
+        setBmiResult(bmiDetails);
+        setModalVisible(true);
+      } catch (error) {
+        console.error('Error saving BMI details to local storage:', error);
+      }
     } else {
       Alert.alert("Invalid Input", "Please enter valid weight and height.");
     }
@@ -62,6 +77,31 @@ const BMICalculator = () => {
 
   const pointerLeft = (parseInt(height) - 100) * 10 + width / 2 - 15;
 
+  // Start and stop functions for handling hold
+  const startChangingWeight = (delta) => {
+    if (weightIntervalRef.current) clearInterval(weightIntervalRef.current);
+
+    weightIntervalRef.current = setInterval(() => {
+      setWeight((prev) => Math.max(1, parseInt(prev) + delta).toString());
+    }, 100); // Faster speed on hold
+  };
+
+  const stopChangingWeight = () => {
+    if (weightIntervalRef.current) clearInterval(weightIntervalRef.current);
+  };
+
+  const startChangingAge = (delta) => {
+    if (ageIntervalRef.current) clearInterval(ageIntervalRef.current);
+
+    ageIntervalRef.current = setInterval(() => {
+      setAge((prev) => Math.max(1, parseInt(prev) + delta).toString());
+    }, 100); // Faster speed on hold
+  };
+
+  const stopChangingAge = () => {
+    if (ageIntervalRef.current) clearInterval(ageIntervalRef.current);
+  };
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView>
@@ -74,6 +114,12 @@ const BMICalculator = () => {
               <FontAwesome5 name="arrow-left" size={20} color="purple" />
             </TouchableOpacity>
             <Text className="text-xl font-bold">BMI Calculator</Text>
+            <TouchableOpacity
+              style={{ position: "absolute", right: 10 }}
+              onPress={() => setMeaningVisible(true)}
+            >
+              <FontAwesome5 name="question-circle" size={20} color="purple" />
+            </TouchableOpacity>
           </View>
 
           <Text className="text-lg font-semibold mb-3">
@@ -81,9 +127,9 @@ const BMICalculator = () => {
           </Text>
           <View className="flex-row justify-center mb-5">
             <TouchableOpacity
-              onPress={() => setGender("male")}
+              onPress={() => setGender("Male")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "male" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Male" ? "bg-purple-200 border-4 border-secondary-300" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -103,20 +149,20 @@ const BMICalculator = () => {
                 <FontAwesome5
                   name="mars"
                   size={18}
-                  color={gender === "male" ? "blue" : "gray"}
+                  color={gender === "Male" ? "blue" : "gray"}
                 />
               </View>
               <MaterialCommunityIcons
                 name="face-man"
                 size={40}
-                color={gender === "male" ? "blue" : "gray"}
+                color={gender === "Male" ? "blue" : "gray"}
               />
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setGender("female")}
+              onPress={() => setGender("Female")}
               className={`flex-1 items-center py-3 mx-2 rounded-lg ${
-                gender === "female" ? "bg-purple-200" : "bg-gray-200"
+                gender === "Female" ? "bg-purple-200 border-4 border-secondary-300" : "bg-gray-200"
               }`}
               style={{ position: "relative" }}
             >
@@ -136,13 +182,13 @@ const BMICalculator = () => {
                 <FontAwesome5
                   name="venus"
                   size={18}
-                  color={gender === "female" ? "red" : "gray"}
+                  color={gender === "Female" ? "red" : "gray"}
                 />
               </View>
               <MaterialCommunityIcons
                 name="face-woman"
                 size={40}
-                color={gender === "female" ? "red" : "gray"}
+                color={gender === "Female" ? "red" : "gray"}
               />
             </TouchableOpacity>
           </View>
@@ -150,7 +196,7 @@ const BMICalculator = () => {
           <Text className="text-lg font-semibold mb-3">
             Please Modify the values
           </Text>
-          <View className="flex-row justify-between mb-5">
+          <View className="flex-row justify-around mb-5">
             <View className="items-center bg-purple-200 w-36 py-5 rounded-lg">
               <Text className="text-lg font-semibold mb-2">Weight (kg)</Text>
               <TextInput
@@ -161,17 +207,17 @@ const BMICalculator = () => {
               />
               <View className="flex-row mt-2">
                 <TouchableOpacity
-                  onPress={() =>
-                    setWeight((prev) => (parseInt(prev) - 1).toString())
-                  }
+                  onPressIn={() => startChangingWeight(-1)}
+                  onPressOut={stopChangingWeight}
+                  onPress={() => setWeight((prev) => Math.max(1, parseInt(prev) - 1).toString())} // Single decrease
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="minus" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() =>
-                    setWeight((prev) => (parseInt(prev) + 1).toString())
-                  }
+                  onPressIn={() => startChangingWeight(1)}
+                  onPressOut={stopChangingWeight}
+                  onPress={() => setWeight((prev) => (parseInt(prev) + 1).toString())} // Single increase
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="plus" size={20} />
@@ -189,17 +235,17 @@ const BMICalculator = () => {
               />
               <View className="flex-row mt-2">
                 <TouchableOpacity
-                  onPress={() =>
-                    setAge((prev) => (parseInt(prev) - 1).toString())
-                  }
+                  onPressIn={() => startChangingAge(-1)}
+                  onPressOut={stopChangingAge}
+                  onPress={() => setAge((prev) => Math.max(1, parseInt(prev) - 1).toString())} // Single decrease
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="minus" size={20} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() =>
-                    setAge((prev) => (parseInt(prev) + 1).toString())
-                  }
+                  onPressIn={() => startChangingAge(1)}
+                  onPressOut={stopChangingAge}
+                  onPress={() => setAge((prev) => (parseInt(prev) + 1).toString())} // Single increase
                   className="bg-white p-2 rounded-full mx-2"
                 >
                   <FontAwesome5 name="plus" size={20} />
@@ -265,8 +311,8 @@ const BMICalculator = () => {
           </View>
 
           <TouchableOpacity
+            className="bg-purple-600 rounded-lg py-4"
             onPress={calculateBMI}
-            className="bg-purple-500 py-4 rounded-lg"
           >
             <Text className="text-center text-white font-bold text-lg">
               Calculate BMI
@@ -275,12 +321,14 @@ const BMICalculator = () => {
         </View>
       </ScrollView>
 
-      {/* Use the BMIModal component */}
-      <BMIModal
-        visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
-        bmiResult={bmiResult}
-      />
+      {/* Show the BMI modal */}
+      {isModalVisible && (
+        <BMIModal
+          bmiResult={bmiResult}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
+      <BMIMeaning isVisible={isMeaningVisible} onClose={() => setMeaningVisible(false)} />
     </SafeAreaView>
   );
 };
