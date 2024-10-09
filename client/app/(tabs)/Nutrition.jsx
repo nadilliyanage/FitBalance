@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
-import CustomButton from "../../components/CustomButton";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import NutritionCalculator from "../pages/Nutrition/NutritionCal";
 import HealthData from "../pages/Nutrition/HealthData";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/Ionicons"; // Import the icon library
 
 const NutriCal = () => {
   // States to track the values from the Nutrition Calculator
@@ -54,11 +54,20 @@ const NutriCal = () => {
 
           {/* Calorie Progress */}
           <View style={{ alignItems: "center", marginBottom: 30 }}>
-            <Text style={{ fontSize: 40, fontWeight: "bold" }}>{calories} Kcal</Text>
-            <Text style={{ fontSize: 16, color: "gray" }}>of 2000 kcal</Text>
+            <Text style={{ fontSize: 40, fontWeight: "bold" }}>
+              {calories} Kcal
+            </Text>
+            <Text style={{ fontSize: 16, color: "gray" }}>of 2213 kcal</Text>
 
             {/* Macros */}
-            <View style={{ flexDirection: "row", justifyContent: "space-around", width: "100%", marginTop: 20 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                width: "100%",
+                marginTop: 20,
+              }}
+            >
               <View>
                 <Text style={{ fontSize: 18 }}>Protein</Text>
                 <Text>{protein}/90g</Text>
@@ -75,26 +84,39 @@ const NutriCal = () => {
           </View>
 
           {/* Food Suggestions Button */}
-          <View style={{ marginBottom: 30 }}>
-            <CustomButton
-              title="Food Suggestions"
-              handlePress={() => setShowEnterHealthData(true)}
-              containerStyles={{ backgroundColor: "#9b59b6", padding: 15, borderRadius: 10 }}
-            />
+          <View className="mb-8">
+            <TouchableOpacity
+              onPress={() => setShowEnterHealthData(true)}
+              className="bg-purple-600 p-4 rounded-lg"
+            >
+              <Text className="text-white text-center">Food Suggestions</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Row for Nutrition Calculator and Health Data buttons */}
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 30 }}>
-            <CustomButton
-              title="Health Data"
-              handlePress={() => setShowEnterHealthData(true)}
-              containerStyles={{ backgroundColor: "#9b59b6", padding: 15, borderRadius: 10, flex: 1, marginRight: 10 }} // Left button with margin to the right
-            />
-            <CustomButton
-              title="Nutrition Calculator"
-              handlePress={() => setShowCalculator(true)}
-              containerStyles={{ backgroundColor: "#9b59b6", padding: 15, borderRadius: 10, flex: 1 }} // Right button
-            />
+          <View className="flex-row justify-between mx-au mb-8">
+            <TouchableOpacity
+              onPress={() => setShowEnterHealthData(true)}
+              className="bg-purple-600 p-4 rounded-lg  mr-2 h-26 w-5/12 "
+            >
+              <Icon name="clipboard" size={20} color="white" className="mr-2" />
+              <Text className="text-white text-center">Health Data</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setShowCalculator(true)}
+              className="bg-purple-600 p-4 rounded-lg  mr-2 h-26 w-5/12"
+            >
+              <Icon
+                name="calculator"
+                size={20}
+                color="white"
+                className="mr-2"
+              />
+              <Text className="text-white text-center">
+                Nutrition Calculator
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

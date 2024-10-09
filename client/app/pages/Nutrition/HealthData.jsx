@@ -5,6 +5,10 @@ import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from "@expo/vector-icons";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Feather from '@expo/vector-icons/Feather';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { BlurView } from 'expo-blur';
 
 const LazyNutrition = lazy(() => import("../../(tabs)/Nutrition"));
 
@@ -188,7 +192,7 @@ const HealthData = () => {
   };
 
   return (
-    <SafeAreaView className="bg-white flex-1 px-2">
+    <SafeAreaView className="bg-gray-50 flex-1 pt-4 px-4">
       <View className="flex-row items-center justify-center mb-5">
         {/* Back Button */}
         <TouchableOpacity
@@ -201,35 +205,39 @@ const HealthData = () => {
       </View>
 
       {submittedData ? (
-        <View className="mb-5 p-4 border border-gray-300 rounded-lg bg-white h-[85%]">
+        <View className="mb-5 p-4 border border-gray-300 rounded-lg bg-white h-min">
+         
           <Text className="text-3xl font-semibold mb-10 text-center">Submitted Health Data</Text> 
-          <Text className="mb-6 text-xl ml-4 font-bold">Hemoglobin:  {submittedData.hemoglobinRange} sfgs</Text>
-          <Text className="mb-6 text-xl ml-4 font-bold">Blood Sugar:  {submittedData.bloodSugarRange}</Text>
-          <Text className="mb-6 text-xl ml-4 font-bold">Total Cholesterol:  {submittedData.totalCholesterolRange}</Text>
-          <Text className="mb-6 text-xl ml-4 font-bold">HDL Cholesterol:  {submittedData.hdlRange}</Text>
-          <Text className="mb-6 text-xl ml-4 font-bold">LDL Cholesterol:  {submittedData.ldlRange}</Text>
-          <Text className="mb-6 text-xl ml-4 font-bold">Triglycerides:  {submittedData.triglyceridesRange}</Text>
-
-          <View className="absolute inset-x-0 bottom-0 mx-4">
-            <Text className="text-lg font-bold mb-2">{getHealthComment()}</Text>
+          <View className="bg-white shadow-xl shadow-black rounded-lg p-4">
+          <Text className="mb-2 text-xl ml-4 font-bold">Hemoglobin:  {submittedData.hemoglobinRange} sfgs</Text>
+          <Text className="mb-2 text-xl ml-4 font-bold">Blood Sugar:  {submittedData.bloodSugarRange}</Text>
+          <Text className="mb-2 text-xl ml-4 font-bold">Total Cholesterol:  {submittedData.totalCholesterolRange}</Text>
+          <Text className="mb-2 text-xl ml-4 font-bold">HDL Cholesterol:  {submittedData.hdlRange}</Text>
+          <Text className="mb-2 text-xl ml-4 font-bold">LDL Cholesterol:  {submittedData.ldlRange}</Text>
+          <Text className="mb-2 text-xl ml-4 font-bold">Triglycerides:  {submittedData.triglyceridesRange}</Text>
           </View>
-          
-        <View className="absolute inset-x-0 bottom-0 mx-4 ">
-          <TouchableOpacity onPress={() => setModalVisible(true)} className="bg-yellow-500 p-4 rounded-xl mb-2">
-            <Text className="text-white text-center text-lg">Edit Health Data</Text>
+        <ScrollView className="h-[40%] bg-secondary-100/40 w-[75%] rounded-lg my-10">
+          <View className="inset-x-0 bottom-0 mx-4 py-6">
+            <Text className="text-lg font-bold mb-2  text-black">{getHealthComment()}</Text>
+          </View>
+          </ScrollView>
+        
+        <View className=" absolute bottom-0 mx-14 my-16  ">
+          <TouchableOpacity onPress={() => setModalVisible(true)} className="bg-yellow-500 p-4 rounded-xl mb-8 w-16 ml-64">
+            <Text className="text-white text-center text-lg"><Feather name="edit-3" size={28} color="white" /></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={deleteHealthData} className="bg-red-500 p-4 rounded-xl mb-2">
-            <Text className="text-white text-center text-lg">Delete Health Data</Text>
+          <TouchableOpacity onPress={deleteHealthData} className="bg-red-500 p-4 rounded-xl mb-8 w-16  ml-64">
+            <Text className="text-white text-center text-lg"><MaterialIcons name="delete-outline" size={28} color="white" /></Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setRecordsModalVisible(true)} className="bg-blue-500 p-4 rounded-xl mb-4">
-            <Text className="text-white text-center text-lg">Past Records</Text>
+          <TouchableOpacity onPress={() => setRecordsModalVisible(true)} className="bg-blue-500 p-4 rounded-xl mb-4 w-16  ml-64">
+            <Text className="text-white text-center text-lg"><MaterialIcons name="history" size={28} color="white" /></Text>
           </TouchableOpacity>
         </View>
         </View>
       ) : (
-        <View className="flex absolute inset-x-0 bottom-0 mx-6 mb-6">
+        <View className="flex mx-6 mb-6">
         <TouchableOpacity onPress={() => setModalVisible(true)} className=" bg-secondary-300 p-10  mb-4 rounded-xl">
           <Text className="text-white text-center text-xl">Enter Health Data</Text>
         </TouchableOpacity>
@@ -243,116 +251,125 @@ const HealthData = () => {
       {/* Past Records Modal */}
       <Modal
         visible={recordsModalVisible}
+        transparent={true}
         animationType="slide"
         onRequestClose={() => setRecordsModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white w-11/12 rounded-lg p-4">
-            <Text className="text-lg font-semibold mb-2">Past Records:</Text>
+      ><BlurView
+      intensity={180} // Adjust the intensity of the blur
+      style={{ flex: 1 }} // Make sure it covers the entire modal
+    >
+        <View className="flex-1 justify-center items-center bg-black/40">
+          <View className="bg-white  shadow-2xl shadow-black w-11/12 rounded-lg p-4 h-[75%]">
+          <View className="flex flex-row justify-between">
+            <Text className="text-2xl font-bold my-2 ">Past Records</Text>
+            <TouchableOpacity onPress={() => setRecordsModalVisible(false)} >
+              <Text><FontAwesome name="close" size={34} color="black" /></Text>
+            </TouchableOpacity>
+            </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {pastRecords.map((record, index) => (
-                <View key={index} className="bg-gray-100 border border-gray-300 rounded-lg p-4 mr-4">
-                  <Text className="mb-2">Hemoglobin: {record.hemoglobinRange}</Text>
-                  <Text className="mb-2">Blood Sugar: {record.bloodSugarRange}</Text>
-                  <Text className="mb-2">Total Cholesterol: {record.totalCholesterolRange}</Text>
-                  <Text className="mb-2">HDL: {record.hdlRange}</Text>
-                  <Text className="mb-2">LDL: {record.ldlRange}</Text>
-                  <Text className="mb-2">Triglycerides: {record.triglyceridesRange}</Text>
-                  <Text className="mb-2">Date: {record.date}</Text> 
-                  <TouchableOpacity onPress={() => deletePastRecord(index)} className="bg-red-500 p-2 rounded">
-                    <Text className="text-white text-center">Delete Record</Text>
+                <View key={index} className="bg-secondary border border-gray-300 rounded-lg p-4 mr-4 mt-2 w-fit ">
+                  <Text className="mt-2 mb-6 text-xl font-pmedium text-white">Hemoglobin: {record.hemoglobinRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white ">Blood Sugar: {record.bloodSugarRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white">Total Cholesterol: {record.totalCholesterolRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white">HDL: {record.hdlRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white">LDL: {record.ldlRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white">Triglycerides: {record.triglyceridesRange}</Text>
+                  <Text className="mb-6 text-xl font-pmedium text-white">Date: {record.date}</Text> 
+                  <TouchableOpacity onPress={() => deletePastRecord(index)} className="bg-white p-2 m-4 rounded-lg flex absolute bottom-0 right-0 w-14 ">
+                    <Text className="text-white text-center"><MaterialIcons name="delete-outline" size={28} color="red" /></Text>
                   </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
-            <TouchableOpacity onPress={() => setRecordsModalVisible(false)} className="bg-gray-500 p-2 rounded mt-4">
-              <Text className="text-white text-center">Close</Text>
-            </TouchableOpacity>
+          
           </View>
         </View>
+        </BlurView>
       </Modal>
 
       <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="bg-white w-11/12 rounded-lg p-4">
-            <Text className="text-lg font-semibold mb-2">Health Data Form</Text>
+  visible={modalVisible}
+  animationType="slide"
+  transparent={true}
+  onRequestClose={() => setModalVisible(false)}
+>
+  <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+    <View className="bg-purple-200 w-11/12 rounded-lg p-6 ">
+      <Text className="text-2xl font-bold text-center mb-4">Health Data</Text>
 
-            <View className="mb-4">
-              <Text className="mb-2">Hemoglobin Level (g/dL)</Text>
-              <Picker selectedValue={hemoglobinRange} style={{ height: 50 }} onValueChange={setHemoglobinRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="12-16 g/dL" value="12-16" />
-                <Picker.Item label="Below 12 g/dL" value="below-12" />
-                <Picker.Item label="Above 16 g/dL" value="above-16" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">Hemoglobin Level (g/dL)</Text>
+        <Picker selectedValue={hemoglobinRange} style={{ height: 50 }} onValueChange={setHemoglobinRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="12-16 g/dL" value="12-16" />
+          <Picker.Item label="Below 12 g/dL" value="below-12" />
+          <Picker.Item label="Above 16 g/dL" value="above-16" />
+        </Picker>
+      </View>
 
-            <View className="mb-4">
-              <Text className="mb-2">Fasting Blood Sugar Level (mg/dL)</Text>
-              <Picker selectedValue={bloodSugarRange} style={{ height: 50 }} onValueChange={setBloodSugarRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="70-99 mg/dL" value="70-99" />
-                <Picker.Item label="100-125 mg/dL" value="100-125" />
-                <Picker.Item label="Above 125 mg/dL" value="above-125" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">Fasting Blood Sugar Level (mg/dL)</Text>
+        <Picker selectedValue={bloodSugarRange} style={{ height: 50 }} onValueChange={setBloodSugarRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="70-99 mg/dL" value="70-99" />
+          <Picker.Item label="100-125 mg/dL" value="100-125" />
+          <Picker.Item label="Above 125 mg/dL" value="above-125" />
+        </Picker>
+      </View>
 
-            <View className="mb-4">
-              <Text className="mb-2">Total Cholesterol (mg/dL)</Text>
-              <Picker selectedValue={totalCholesterolRange} style={{ height: 50 }} onValueChange={setTotalCholesterolRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="Less than 200 mg/dL" value="less-200" />
-                <Picker.Item label="200-239 mg/dL" value="200-239" />
-                <Picker.Item label="240 mg/dL and above" value="240+" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">Total Cholesterol (mg/dL)</Text>
+        <Picker selectedValue={totalCholesterolRange} style={{ height: 50 }} onValueChange={setTotalCholesterolRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="Less than 200 mg/dL" value="less-200" />
+          <Picker.Item label="200-239 mg/dL" value="200-239" />
+          <Picker.Item label="240 mg/dL and above" value="240+" />
+        </Picker>
+      </View>
 
-            <View className="mb-4">
-              <Text className="mb-2">HDL (Good) Cholesterol (mg/dL)</Text>
-              <Picker selectedValue={hdlRange} style={{ height: 50 }} onValueChange={setHdlRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="40-60 mg/dL" value="40-60" />
-                <Picker.Item label="Above 60 mg/dL" value="above-60" />
-                <Picker.Item label="Below 40 mg/dL" value="below-40" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">HDL (Good) Cholesterol (mg/dL)</Text>
+        <Picker selectedValue={hdlRange} style={{ height: 50 }} onValueChange={setHdlRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="40-60 mg/dL" value="40-60" />
+          <Picker.Item label="Above 60 mg/dL" value="above-60" />
+          <Picker.Item label="Below 40 mg/dL" value="below-40" />
+        </Picker>
+      </View>
 
-            <View className="mb-4">
-              <Text className="mb-2">LDL (Bad) Cholesterol (mg/dL)</Text>
-              <Picker selectedValue={ldlRange} style={{ height: 50 }} onValueChange={setLdlRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="Less than 100 mg/dL" value="less-100" />
-                <Picker.Item label="100-129 mg/dL" value="100-129" />
-                <Picker.Item label="Above 129 mg/dL" value="above-129" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">LDL (Bad) Cholesterol (mg/dL)</Text>
+        <Picker selectedValue={ldlRange} style={{ height: 50 }} onValueChange={setLdlRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="Less than 100 mg/dL" value="less-100" />
+          <Picker.Item label="100-129 mg/dL" value="100-129" />
+          <Picker.Item label="Above 129 mg/dL" value="above-129" />
+        </Picker>
+      </View>
 
-            <View className="mb-4">
-              <Text className="mb-2">Triglycerides Level (mg/dL)</Text>
-              <Picker selectedValue={triglyceridesRange} style={{ height: 50 }} onValueChange={setTriglyceridesRange}>
-                <Picker.Item label="Select range" value="" />
-                <Picker.Item label="Less than 150 mg/dL" value="less-150" />
-                <Picker.Item label="150-199 mg/dL" value="150-199" />
-                <Picker.Item label="200 mg/dL and above" value="200+" />
-              </Picker>
-            </View>
+      <View className="mb-4 bg-white p-2 rounded-lg">
+        <Text className=" font-bold text-lg">Triglycerides Level (mg/dL)</Text>
+        <Picker selectedValue={triglyceridesRange} style={{ height: 50 }} onValueChange={setTriglyceridesRange}>
+          <Picker.Item label="Select range" value="" />
+          <Picker.Item label="Less than 150 mg/dL" value="less-150" />
+          <Picker.Item label="150-199 mg/dL" value="150-199" />
+          <Picker.Item label="200 mg/dL and above" value="200+" />
+        </Picker>
+      </View>
 
-            <TouchableOpacity onPress={handleSubmit} className="bg-green-500 p-3 rounded mb-2 flex-row items-center justify-center">
-              <Text className="text-white">Submit Health Data</Text>
-              <Icon name="arrow-right" size={20} color="white" />
-            </TouchableOpacity>
+      <TouchableOpacity onPress={handleSubmit} className="bg-purple-500 p-3 rounded-xl mb-2 flex-row items-center justify-center">
+        <Text className="text-white font-bold text-lg">Submit  </Text>
+        <Icon name="arrow-right" size={20} color="white" />
+      </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setModalVisible(false)} className="bg-red-500 p-3 rounded">
-              <Text className="text-white">Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal> 
+      <TouchableOpacity onPress={() => setModalVisible(false)} className="bg-red-500 p-3 rounded-xl">
+        <Text className="text-white text-center text-lg">Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </SafeAreaView>
   );
 };
