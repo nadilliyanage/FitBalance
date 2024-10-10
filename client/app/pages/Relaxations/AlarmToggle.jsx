@@ -1,9 +1,9 @@
-// components/AlarmToggle.js
-
 import React, { useState, useEffect } from "react";
-import { View, Text, Switch, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Switch, TouchableOpacity } from "react-native";
 import * as Notifications from "expo-notifications";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const AlarmToggle = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -11,19 +11,62 @@ const AlarmToggle = () => {
   const [alarmTime, setAlarmTime] = useState(new Date());
 
   const alarmSound =
-    "https://firebasestorage.googleapis.com/v0/b/fitbalace360.appspot.com/o/alarm%2Fgermany-eas-alarm-1945-242750.mp3?alt=media&token=1a92b062-9e68-47a9-8832-76df9c4d990f";
+    "https://firebasestorage.googleapis.com/v0/b/fitbalace360.appspot.com/o/alarm%2Falarmsound.wav?alt=media&token=cdca16a2-4c28-40fa-b12a-234dc67cf53e";
 
-  const toggleSwitch = () => setIsEnabled((prev) => !prev);
+  // Toggle the alarm on/off
+  const toggleSwitch = async () => {
+    const newState = !isEnabled;
+    setIsEnabled(newState);
 
-  const onChange = (event, selectedTime) => {
+    // Cancel scheduled notifications if the alarm is turned off
+    if (!newState) {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+      await AsyncStorage.removeItem("alarmTime");
+    }
+
+    // Store the updated state in AsyncStorage
+    await AsyncStorage.setItem("isEnabled", JSON.stringify(newState));
+  };
+
+  // Handle changes in the DateTimePicker
+  const onChange = async (event, selectedTime) => {
     const currentTime = selectedTime || alarmTime;
     setShowPicker(false);
     setAlarmTime(currentTime);
+
+    // Schedule the alarm if it's enabled
     if (isEnabled) {
       scheduleAlarm(currentTime);
     }
+
+    // Store the alarm time in AsyncStorage
+    await AsyncStorage.setItem("alarmTime", currentTime.toString());
   };
 
+  // Calculate remaining time until the alarm
+  const calculateRemainingTime = (time) => {
+    const now = new Date();
+
+    // Adjust for the next day if the alarm time is in the past
+    if (time < now) {
+      time.setDate(time.getDate() + 1); // Set alarm for the next day
+    }
+
+    const timeDifference = time - now; // Difference in milliseconds
+
+    // Calculate remaining days, hours, and minutes
+    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24 * 24));
+    const hours = Math.floor(
+      (timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor(
+      (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+    );
+
+    return { days, hours, minutes };
+  };
+
+  // Schedule the alarm notification
   const scheduleAlarm = async (time) => {
     await Notifications.scheduleNotificationAsync({
       content: {
@@ -38,24 +81,70 @@ const AlarmToggle = () => {
       },
     });
 
-    Alert.alert(
-      "Alarm Set",
-      `Alarm is set for ${time.getHours()}:${
-        time.getMinutes() < 10 ? "0" : ""
-      }${time.getMinutes()}`
-    );
+    const { days, hours, minutes } = calculateRemainingTime(time);
+
+    // Format remaining time message
+    let remainingTimeMessage = "";
+    if (days > 0) {
+      remainingTimeMessage += `${days} day${days > 1 ? "s" : ""}, `;
+    }
+    if (hours > 0 || days > 0) {
+      remainingTimeMessage += `${hours} hour${hours > 1 ? "s" : ""} `;
+    }
+    remainingTimeMessage += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+
+    // Show toast with remaining time when the alarm is set
+    Toast.show({
+      type: "success",
+      text1: "Alarm Set",
+      text2: `Alarm is set for ${remainingTimeMessage} from now`,
+      position: "top",
+    });
+  };
+
+  // Load alarm settings from AsyncStorage
+  const loadAlarmSettings = async () => {
+    try {
+      const savedEnabledState = await AsyncStorage.getItem("isEnabled");
+      const savedAlarmTime = await AsyncStorage.getItem("alarmTime");
+
+      if (savedEnabledState !== null) {
+        setIsEnabled(JSON.parse(savedEnabledState));
+      }
+
+      if (savedAlarmTime !== null) {
+        const alarmDate = new Date(savedAlarmTime);
+        setAlarmTime(alarmDate);
+
+        // Reschedule the alarm if it's enabled
+        if (JSON.parse(savedEnabledState)) {
+          scheduleAlarm(alarmDate);
+        }
+      }
+    } catch (error) {
+      console.log("Failed to load alarm settings:", error);
+    }
   };
 
   useEffect(() => {
     const requestPermissions = async () => {
       await Notifications.requestPermissionsAsync();
     };
-    requestPermissions();
 
-    if (isEnabled) {
-      scheduleAlarm(alarmTime);
-    }
-  }, [isEnabled]);
+    requestPermissions();
+    loadAlarmSettings(); // Load saved alarm settings when component mounts
+  }, []);
+
+  // Helper function to format time in 12-hour format with AM/PM
+  const formatTime = (time) => {
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+  };
 
   return (
     <View className="my-2 bg-white rounded-lg shadow">
@@ -63,8 +152,7 @@ const AlarmToggle = () => {
       <View className="flex flex-row justify-between bg-secondary p-4 m-2 rounded-lg">
         <TouchableOpacity onPress={() => setShowPicker(true)}>
           <Text className="mt-2 text-2xl font-bold text-white">
-            {alarmTime.getHours()}:{alarmTime.getMinutes() < 10 ? "0" : ""}
-            {alarmTime.getMinutes()}
+            {formatTime(alarmTime)}
           </Text>
         </TouchableOpacity>
         <Switch
@@ -78,7 +166,7 @@ const AlarmToggle = () => {
         <DateTimePicker
           value={alarmTime}
           mode="time"
-          is24Hour={true}
+          is24Hour={false} // Set to false to show 12-hour format
           display="default"
           onChange={onChange}
         />
