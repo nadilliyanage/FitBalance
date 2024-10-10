@@ -1,12 +1,29 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/CustomButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 
-const Recommendations = ({ stressLevel }) => {
+const Recommendations = () => {
   const [back, setBack] = useState(false);
+  const [stressLevel, setStressLevel] = useState(null);
+
+  useEffect(() => {
+    const fetchStressLevel = async () => {
+      try {
+        const savedStressLevel = await AsyncStorage.getItem("stressLevel");
+        if (savedStressLevel) {
+          setStressLevel(savedStressLevel);
+        }
+      } catch (error) {
+        console.error("Failed to load stress level", error);
+      }
+    };
+
+    fetchStressLevel();
+  }, []);
 
   const getRecommendations = () => {
     switch (stressLevel) {
@@ -16,6 +33,7 @@ const Recommendations = ({ stressLevel }) => {
         return ["Short Walks", "Listening to Music", "Journaling"];
       case "Mild Stress Day":
         return ["Reading", "Creative Hobbies", "Relaxing Bath"];
+      case "Low Stress Day":
       default:
         return [
           "Take a moment to appreciate your day!",

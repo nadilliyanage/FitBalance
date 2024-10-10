@@ -7,6 +7,8 @@ import { AuthContext } from "../../context/authContext";
 import Profile from "../pages/profile";
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore functions
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import SavedStressRate from "../pages/Relaxations/SavedStressRate";
+import WeeklySleepGraph from "../pages/Relaxations/WeeklySleepGraph";
 
 const Home = () => {
   // Global state
@@ -68,11 +70,16 @@ const Home = () => {
       </View>
 
       <FlatList
-        className="bg-black-200"
+        className="bg-white"
         data={[{ id: 1 }]}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <Text className="text-3xl">{item.id}</Text>}
-        ListHeaderComponent={() => <View></View>}
+        // renderItem={({ item }) => <Text className="text-3xl">{item.id}</Text>}
+        ListHeaderComponent={() => (
+          <View>
+            <SavedStressRate />
+            <WeeklySleepGraph />
+          </View>
+        )}
       />
     </SafeAreaView>
   );

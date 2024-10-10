@@ -11,6 +11,7 @@ import { LineChart } from "react-native-chart-kit";
 import { Picker } from "@react-native-picker/picker";
 import CustomButton from "../../../components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BlurView } from "expo-blur";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -99,8 +100,8 @@ const SleepTracker = () => {
   });
 
   return (
-    <View className="w-full h-fit">
-      <View className="flex-row justify-center mb-4">
+    <View className="w-full h-fit flex items-center">
+      <View className="flex-row justify-center my-2 border border-secondary-100 rounded-full w-56">
         <TouchableOpacity onPress={() => setTimeFrame("weekly")}>
           <Text
             className={`text-lg font-bold ${
@@ -110,7 +111,7 @@ const SleepTracker = () => {
             Weekly
           </Text>
         </TouchableOpacity>
-        <Text className="mx-4 text-lg font-bold">|</Text>
+        <Text className="mx-4 text-2xl font-bold">|</Text>
         <TouchableOpacity onPress={() => setTimeFrame("monthly")}>
           <Text
             className={`text-lg font-bold ${
@@ -121,6 +122,17 @@ const SleepTracker = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <Text className="text-lg font-bold text-black text-center">
+        Sleep Quality is{" "}
+        <Text
+          style={{
+            color: sleepQuality === "Bad" ? "red" : "blue",
+          }}
+        >
+          {sleepQuality}
+        </Text>
+      </Text>
 
       {timeFrame === "monthly" && (
         <View className="mb-4">
@@ -141,70 +153,60 @@ const SleepTracker = () => {
           </Picker>
         </View>
       )}
-
-      <LineChart
-        data={{
-          labels: labels,
-          datasets: [
-            {
-              data:
-                timeFrame === "weekly"
-                  ? customSleepData.map(Number) // Use custom sleep data for weekly
-                  : generateMonthlySleepData(selectedMonth),
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <LineChart
+          data={{
+            labels: labels,
+            datasets: [
+              {
+                data:
+                  timeFrame === "weekly"
+                    ? customSleepData.map(Number) // Use custom sleep data for weekly
+                    : generateMonthlySleepData(selectedMonth),
+              },
+            ],
+          }}
+          width={screenWidth - 20}
+          height={220}
+          yAxisSuffix="h"
+          yAxisInterval={1}
+          chartConfig={{
+            backgroundColor: "#1cc910",
+            backgroundGradientFrom: "#eff3ff",
+            backgroundGradientTo: "#efefef",
+            decimalPlaces: 1,
+            color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: {
+              borderRadius: 16,
             },
-          ],
-        }}
-        width={screenWidth - 20}
-        height={220}
-        yAxisSuffix="h"
-        yAxisInterval={1}
-        chartConfig={{
-          backgroundColor: "#1cc910",
-          backgroundGradientFrom: "#eff3ff",
-          backgroundGradientTo: "#efefef",
-          decimalPlaces: 1,
-          color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          style: {
+            propsForDots: {
+              r: "4",
+              strokeWidth: "1",
+              stroke: "#ffa726",
+            },
+            propsForLabels: {
+              fontSize: 8,
+            },
+          }}
+          bezier
+          style={{
+            marginVertical: 2,
             borderRadius: 16,
-          },
-          propsForDots: {
-            r: "4",
-            strokeWidth: "1",
-            stroke: "#ffa726",
-          },
-          propsForLabels: {
-            fontSize: 8,
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 2,
-          borderRadius: 16,
-        }}
-      />
+          }}
+        />
+      </TouchableOpacity>
 
-      {/* Show the button only when timeFrame is "weekly" */}
-      {timeFrame === "weekly" && (
+      {/* {timeFrame === "weekly" && (
         <CustomButton
           title="Customize Sleep Data"
           handlePress={() => setModalVisible(true)}
           containerStyles="w-full mb-2"
         />
-      )}
+      )} */}
 
-      <View className="mt-4">
-        <Text className="text-lg font-bold text-black">
-          Sleep Quality:{" "}
-          <Text
-            style={{
-              color: sleepQuality === "Bad" ? "red" : "blue",
-            }}
-          >
-            {sleepQuality}
-          </Text>
-        </Text>
-        <Text className="text-gray-600 mt-2">
+      <View className="mt-2">
+        <Text className="text-gray-600 text-center">
           Average Sleep: {averageSleep.toFixed(2)} hours
         </Text>
       </View>
@@ -216,41 +218,46 @@ const SleepTracker = () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-          <View className="w-4/5 bg-white rounded-lg p-4">
-            <Text className="text-lg font-bold mb-4">
-              Enter Your Sleep Data
-            </Text>
-            {customSleepData.map((sleepHour, index) => (
-              <TextInput
-                key={index}
-                value={sleepHour}
-                onChangeText={(text) => {
-                  const updatedData = [...customSleepData];
-                  updatedData[index] = text;
-                  setCustomSleepData(updatedData);
-                }}
-                placeholder={`Day ${index + 1} (hours)`}
-                keyboardType="numeric"
-                className="border border-gray-300 rounded p-2 mb-2"
-              />
-            ))}
+        <BlurView
+          intensity={180} // Adjust the intensity of the blur
+          style={{ flex: 1 }} // Make sure it covers the entire modal
+        >
+          <View className="flex-1 justify-center items-center  bg-black/40">
+            <View className="w-4/5 bg-white rounded-lg p-4 shadow-2xl shadow-black">
+              <Text className="text-lg font-bold mb-4">
+                Enter Your Sleep Data
+              </Text>
+              {customSleepData.map((sleepHour, index) => (
+                <TextInput
+                  key={index}
+                  value={sleepHour}
+                  onChangeText={(text) => {
+                    const updatedData = [...customSleepData];
+                    updatedData[index] = text;
+                    setCustomSleepData(updatedData);
+                  }}
+                  placeholder={`Day ${index + 1} (hours)`}
+                  keyboardType="numeric"
+                  className="border border-gray-300 rounded p-2 mb-2"
+                />
+              ))}
 
-            <CustomButton
-              title="Save Data"
-              handlePress={() => {
-                saveCustomSleepData(customSleepData); // Save to AsyncStorage
-                setModalVisible(false);
-              }}
-              containerStyles="w-full"
-            />
-            <CustomButton
-              title="Close"
-              handlePress={() => setModalVisible(false)}
-              containerStyles="w-full mt-2"
-            />
+              <CustomButton
+                title="Save Data"
+                handlePress={() => {
+                  saveCustomSleepData(customSleepData); // Save to AsyncStorage
+                  setModalVisible(false);
+                }}
+                containerStyles="w-full"
+              />
+              <CustomButton
+                title="Close"
+                handlePress={() => setModalVisible(false)}
+                containerStyles="w-full mt-2"
+              />
+            </View>
           </View>
-        </View>
+        </BlurView>
       </Modal>
     </View>
   );

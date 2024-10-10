@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/CustomButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 const LazyRecommendations = lazy(() => import("./Recommendations"));
@@ -53,25 +54,33 @@ const DailyStressQuiz = () => {
     }
   };
 
-  const calculateStressLevel = () => {
+  const calculateStressLevel = async () => {
     const totalScore = answers.reduce((acc, curr) => acc + (curr || 0), 0);
     const maxScore = questions.length * 4;
     const percentage = (totalScore / maxScore) * 100;
-    let stressLevel = "Low Stress Day";
+    let stressLevel = "Low Stress";
 
     if (totalScore >= 31) {
-      stressLevel = "High Stress Day";
+      stressLevel = "High Stress";
     } else if (totalScore >= 21) {
-      stressLevel = "Moderate Stress Day";
+      stressLevel = "Moderate Stress";
     } else if (totalScore >= 11) {
-      stressLevel = "Mild Stress Day";
+      stressLevel = "Mid Stress";
     }
 
-    setResult({
+    const newResult = {
       score: totalScore,
       level: stressLevel,
       progress: percentage / 100,
-    });
+    };
+
+    setResult(newResult);
+
+    // Save stress rate to AsyncStorage
+    await AsyncStorage.setItem(
+      "stressRate",
+      JSON.stringify({ level: newResult.level, progress: newResult.progress })
+    );
   };
 
   if (back) {
@@ -159,7 +168,7 @@ const DailyStressQuiz = () => {
                   This is classified as a
                 </Text>
                 <Text className="text-xl font-bold text-center mt-4">
-                  "{result.level}".
+                  "{result.level}" Day.
                 </Text>
                 <CustomButton
                   title="Recommendations"
