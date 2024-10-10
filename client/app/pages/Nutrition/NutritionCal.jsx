@@ -223,7 +223,7 @@ const NutritionCalculator = () => {
         {/* Add Food Button */}
         <TouchableOpacity
           onPress={addFood}
-          className="bg-secondary-300 p-4 rounded-xl mt-6 border border-white"
+          className="bg-secondary-100 p-4 rounded-xl mt-6 border border-white"
         >
           <Text className="text-white text-center text-lg font-bold">
             Add Food
@@ -269,7 +269,7 @@ const NutritionCalculator = () => {
       {/* Show Summary Button */}
       <TouchableOpacity
         onPress={() => setSummaryModalVisible(true)}
-        className="bg-secondary-300 p-4 rounded-xl mt-4"
+        className="bg-secondary-100 p-4 rounded-xl mt-4"
       >
         <Text className="text-white text-center text-lg font-bold">
           Show Summary
@@ -409,7 +409,7 @@ const NutritionCalculator = () => {
       {/* Past Calculations Button */}
       <TouchableOpacity
         onPress={() => setRecordsModalVisible(true)}
-        className="bg-secondary-200 p-4 rounded-xl my-4"
+        className="bg-secondary-300 p-4 rounded-xl my-4"
       >
         <Text className="text-white text-center text-lg font-bold">
           Past Calculations

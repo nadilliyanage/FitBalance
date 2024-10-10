@@ -2,118 +2,123 @@ import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import NutritionCalculator from "../pages/Nutrition/NutritionCal";
 import HealthData from "../pages/Nutrition/HealthData";
+import FSuggetions from "../pages/Nutrition/FSuggest";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/Ionicons"; // Import the icon library
+import Icon from "react-native-vector-icons/Ionicons";
 
 const NutriCal = () => {
-  // States to track the values from the Nutrition Calculator
-  const [calories, setCalories] = useState(0); // default value
-  const [protein, setProtein] = useState(0); // default value
-  const [fats, setFats] = useState(0); // default value
-  const [carbs, setCarbs] = useState(0); // default value
-
+  const [calories, setCalories] = useState(0);
+  const [protein, setProtein] = useState(0);
+  const [fats, setFats] = useState(0);
+  const [carbs, setCarbs] = useState(0);
   const [showCalculator, setShowCalculator] = useState(false);
   const [showEnterHealthData, setShowEnterHealthData] = useState(false);
+  const [showFSuggetions, setShowFSuggetions] = useState(false);
 
-  // Fetch data from Nutrition Calculator's last entries
   useEffect(() => {
-    // Simulating fetching data from the calculator (use actual data from the last entries)
     const fetchData = () => {
-      // This data should come from NutritionCalculator's last saved state/entries
       const lastEntries = {
-        calories: 1850,
-        protein: 85,
-        fats: 50,
-        carbs: 100,
+        calories: 0,
+        protein: 0,
+        fats: 0,
+        carbs: 0,
       };
-
       setCalories(lastEntries.calories);
       setProtein(lastEntries.protein);
       setFats(lastEntries.fats);
       setCarbs(lastEntries.carbs);
     };
-
     fetchData();
   }, [showCalculator]);
 
   if (showCalculator) {
-    return <NutritionCalculator />; // Display the nutrition calculator directly
+    return <NutritionCalculator />;
   }
   if (showEnterHealthData) {
-    return <HealthData />; // Display the add health data directly
+    return <HealthData />;
+  }
+  if (showFSuggetions) {
+    return <FSuggetions />;
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView className="flex-1 bg-white">
       <ScrollView>
-        <View style={{ padding: 20 }}>
-          {/* Header section */}
-          <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
+        <View className="px-6 py-8">
+          {/* Header */}
+          <Text className="text-2xl font-extrabold text-gray-900 mb-10 mt-4 text-center">
             Track your diet journey
           </Text>
 
           {/* Calorie Progress */}
-          <View style={{ alignItems: "center", marginBottom: 30 }}>
-            <Text style={{ fontSize: 40, fontWeight: "bold" }}>
-              {calories} Kcal
-            </Text>
-            <Text style={{ fontSize: 16, color: "gray" }}>of 2213 kcal</Text>
+          <View className="flex items-center mb-10 bg-purple-200 rounded-xl p-8 shadow-lg">
+            <Text className="text-4xl font-bold text-blue-600">{calories} Kcal</Text>
+            <Text className="text-base text-gray-500">of 2000 kcal</Text>
 
             {/* Macros */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-around",
-                width: "100%",
-                marginTop: 20,
-              }}
-            >
-              <View>
-                <Text style={{ fontSize: 18 }}>Protein</Text>
-                <Text>{protein}/90g</Text>
+            <View className="flex-row justify-around w-full mt-8 mb-4">
+              <View className="items-center bg-white rounded-lg p-4 shadow-md">
+                <Text className="text-lg font-semibold text-blue-600">Protein</Text>
+                <Text className="text-blue-400 font-bold text-lg">{protein}/90g</Text>
+                <View className="w-full bg-gray-200 h-2 rounded-full mt-2">
+  <View
+    className="bg-blue-500 h-2 rounded-full"
+    style={{ width: `${(protein / 90) * 100}%` }} // Correct percentage style
+  />
+</View>
+
               </View>
-              <View>
-                <Text style={{ fontSize: 18 }}>Fats</Text>
-                <Text>{fats}/70g</Text>
+              <View className="items-center bg-white rounded-lg p-4 shadow-md">
+                <Text className="text-lg font-semibold text-pink-600">Fats</Text>
+                <Text className="text-pink-400 font-bold text-lg">{fats}/70g</Text>
+                <View className="w-full bg-gray-200 h-2 rounded-full mt-2">
+  <View
+    className="bg-pink-500 h-2 rounded-full"
+    style={{ width: `${(fats / 70) * 100}%` }}
+  />
+</View>
+
               </View>
-              <View>
-                <Text style={{ fontSize: 18 }}>Carbs</Text>
-                <Text>{carbs}/110g</Text>
+              <View className="items-center bg-white rounded-lg p-4 shadow-md">
+                <Text className="text-lg font-semibold text-yellow-600">Carbs</Text>
+                <Text className="text-yellow-400 font-bold text-lg">{carbs}/110g</Text>
+                <View className="w-full bg-gray-200 h-2 rounded-full mt-2">
+  <View
+    className="bg-yellow-500 h-2 rounded-full"
+    style={{ width: `${(carbs / 110) * 100}%` }}
+  />
+</View>
+
               </View>
             </View>
           </View>
 
           {/* Food Suggestions Button */}
-          <View className="mb-8">
-            <TouchableOpacity
-              onPress={() => setShowEnterHealthData(true)}
-              className="bg-purple-600 p-4 rounded-lg"
-            >
-              <Text className="text-white text-center">Food Suggestions</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => setShowFSuggetions(true)}
+            className="bg-secondary-100 p-4 rounded-xl mb-10 shadow-md"
+          >
+            <Text className="text-white text-center text-lg font-semibold">
+              Food Suggestions
+            </Text>
+          </TouchableOpacity>
 
           {/* Row for Nutrition Calculator and Health Data buttons */}
-          <View className="flex-row justify-between mx-au mb-8">
+          <View className="flex-row justify-between mb-8">
             <TouchableOpacity
               onPress={() => setShowEnterHealthData(true)}
-              className="bg-purple-600 p-4 rounded-lg  mr-2 h-26 w-5/12 "
+              className="bg-secondary-100 h-36 w-36 rounded-xl shadow-md flex items-center justify-center"
             >
-              <Icon name="clipboard" size={20} color="white" className="mr-2" />
-              <Text className="text-white text-center">Health Data</Text>
+              <Icon name="clipboard" size={30} color="white" />
+              <Text className="text-white text-lg text-center mt-1">Health Data</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowCalculator(true)}
-              className="bg-purple-600 p-4 rounded-lg  mr-2 h-26 w-5/12"
+              className="bg-secondary-100 h-36 w-36 rounded-xl shadow-md flex items-center justify-center"
             >
-              <Icon
-                name="calculator"
-                size={20}
-                color="white"
-                className="mr-2"
-              />
-              <Text className="text-white text-center">
+              <Icon name="calculator" size={30} color="white" />
+              <Text className="text-white text-lg text-center mt-1">
                 Nutrition Calculator
               </Text>
             </TouchableOpacity>
