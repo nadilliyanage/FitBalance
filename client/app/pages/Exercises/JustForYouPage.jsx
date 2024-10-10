@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ClassCard from "../../../components/ClassCard";
 import ClassDetailsModal from "../../../components/ClassDetailsModal"; // Import the ClassDetailsModal
 import { classes } from "../../data/classes";
+import ProgressTracker from "../../../components/ClassProgressTracker";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
@@ -132,29 +133,8 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
     }
   };
 
-  const handleDeleteProgress = async () => {
-    Alert.alert(
-      "Confirm Reset",
-      "Are you sure you want to reset your progress?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Reset",
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem("userProgress");
-              setProgress(0);
-            } catch (error) {
-              console.error("Error deleting BMI results:", error);
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  const handleDeleteProgress = (newProgress) => {
+    setProgress(newProgress); // Update progress in the parent
   };
 
   const renderClassItem = ({ item }) => (
@@ -172,15 +152,10 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   return (
     <View className="flex-1 justify-center items-center bg-white">
       {/* Progress Tracker */}
-      <View className="p-4 bg-purple-400 rounded-xl w-full flex-row justify-between items-center mb-2">
-        <Text className="text-lg font-semibold text-white">
-          Progress: {progress} Class(es) Completed
-        </Text>
-        <TouchableOpacity onPress={handleDeleteProgress} className="bg-white rounded-full p-2 w-auto items-center justify-center">
-        <FontAwesome name="repeat" size={18} color="red" />
-        </TouchableOpacity>
-
-      </View>
+      <ProgressTracker 
+        progress={progress} 
+        onDeleteProgress={handleDeleteProgress} 
+      />
 
       <Text className="text-xl font-bold mb-5">Classes Just For You</Text>
       {bmiResult && filteredClasses.length > 0 ? (
