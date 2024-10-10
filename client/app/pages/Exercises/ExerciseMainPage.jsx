@@ -70,7 +70,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
   return (
   
-    <View className="flex-1 px-5 pt-10 bg-white">
+    <View className="flex-1 px-5 pt-2 bg-white">
       
       <View className="items-center">
         <Text className="text-3xl font-bold text-center text-black">Exercises</Text>
