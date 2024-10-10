@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ClassCard from "../../../components/ClassCard";
 import ClassDetailsModal from "../../../components/ClassDetailsModal"; // Import the ClassDetailsModal
 import { classes } from "../../data/classes";
-import { Feather } from '@expo/vector-icons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
   const [bmiResult, setBmiResult] = useState(null);
@@ -177,7 +177,7 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
           Progress: {progress} Class(es) Completed
         </Text>
         <TouchableOpacity onPress={handleDeleteProgress} className="bg-white rounded-full p-2 w-auto items-center justify-center">
-        <Feather name="trash" size={18} color="red" />
+        <FontAwesome name="repeat" size={18} color="red" />
         </TouchableOpacity>
 
       </View>
@@ -188,7 +188,7 @@ const JustForYouPage = ({ filterText = "", searchBy = "" }) => {
           data={filteredClasses}
           renderItem={renderClassItem}
           keyExtractor={(item) => item.Name}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          // contentContainerStyle={{ padding: 10 }}
         />
       ) : (
         <Text>No classes available for your BMI category.</Text>

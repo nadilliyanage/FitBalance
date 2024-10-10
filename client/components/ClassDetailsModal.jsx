@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ClassDetailsModal = ({
   isVisible,
@@ -20,8 +20,9 @@ const ClassDetailsModal = ({
 }) => {
   const [activeTab, setActiveTab] = useState("Overview");
   const [remainingTime, setRemainingTime] = useState(0);
-  const [progress, setProgress] = useState(0); // Track progress
-  const [countdownActive, setCountdownActive] = useState(false); // Track countdown state
+  const [progress, setProgress] = useState(0);
+  const [countdownActive, setCountdownActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false); // New state for pause functionality
 
   // Load progress from AsyncStorage when the modal is visible
   useEffect(() => {
@@ -32,7 +33,7 @@ const ClassDetailsModal = ({
           if (savedProgress !== null) {
             setProgress(JSON.parse(savedProgress));
           } else {
-            setProgress(0); // Reset progress if nothing is saved
+            setProgress(0);
           }
         } catch (error) {
           console.error("Error loading progress", error);
@@ -45,12 +46,12 @@ const ClassDetailsModal = ({
 
   useEffect(() => {
     let timer;
-    if (countdownActive) {
+    if (countdownActive && !isPaused) {
       timer = setInterval(() => {
         setRemainingTime((prevTime) => {
           if (prevTime <= 0) {
             clearInterval(timer);
-            return 0; // Reset remaining time when countdown completes
+            return 0;
           }
           return prevTime - 1;
         });
@@ -58,38 +59,46 @@ const ClassDetailsModal = ({
     }
 
     return () => clearInterval(timer);
-  }, [countdownActive]);
+  }, [countdownActive, isPaused]); // Include isPaused in the dependency array
 
   const handleStartClass = () => {
-    const durationInSeconds = Math.max(classDetails.duration || 0, 0);
-    setRemainingTime(durationInSeconds);
-    setCountdownActive(true); // Start the countdown
+    if (classDetails) {
+      const durationInSeconds = Math.max(classDetails.duration || 0, 0);
+      setRemainingTime(durationInSeconds);
+      setCountdownActive(true);
+      setIsPaused(false); // Start the class and set paused to false
+    }
+  };
+
+  const handlePauseClass = () => {
+    setIsPaused((prev) => !prev); // Toggle the pause state
   };
 
   const checkAndIncreaseProgress = async () => {
-    const durationInSeconds = Math.max(classDetails.duration || 0, 0);
-    if (remainingTime <= 0) {
-      // Only increase progress if the class duration has completed
-      setProgress((prevProgress) => {
-        const newProgress = prevProgress + 1;
-        saveProgressToStorage(newProgress);
-        Alert.alert("Well done!", "You have completed a class!", [
-          {
-            text: "OK",
-            onPress: () => {
-              onClose(); // Close the modal when OK is pressed
-              onStartClass(classDetails.duration, classDetails.Name); // Refresh the JustForYouPage
+    if (classDetails) {
+      const durationInSeconds = Math.max(classDetails.duration || 0, 0);
+      if (remainingTime <= 0) {
+        setProgress((prevProgress) => {
+          const newProgress = prevProgress + 1;
+          saveProgressToStorage(newProgress);
+          Alert.alert("Well done!", "You have completed a class!", [
+            {
+              text: "OK",
+              onPress: () => {
+                onClose();
+                onStartClass(classDetails.duration, classDetails.Name);
+              },
             },
-          },
-        ]);
-        return newProgress;
-      });
+          ]);
+          return newProgress;
+        });
+      }
     }
   };
 
   const saveProgressToStorage = async (newProgress) => {
     try {
-      await AsyncStorage.setItem("userProgress", JSON.stringify(newProgress)); // Save progress
+      await AsyncStorage.setItem("userProgress", JSON.stringify(newProgress));
     } catch (error) {
       console.error("Error saving progress to storage", error);
     }
@@ -97,8 +106,8 @@ const ClassDetailsModal = ({
 
   useEffect(() => {
     if (remainingTime === 0 && countdownActive) {
-      setCountdownActive(false); // Stop countdown
-      checkAndIncreaseProgress(); // Check and increase progress
+      setCountdownActive(false);
+      checkAndIncreaseProgress();
     }
   }, [remainingTime, countdownActive]);
 
@@ -163,7 +172,7 @@ const ClassDetailsModal = ({
 
   return (
     <Modal visible={isVisible} animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-white px-1">
         {/* Top Section with Back Arrow */}
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={onClose} className="mr-4">
@@ -224,13 +233,15 @@ const ClassDetailsModal = ({
           </Text>
         </View>
 
-        {/* Start Now Button */}
+        {/* Start Now / Pause Button */}
         <View className="p-4">
           <TouchableOpacity
             className="bg-secondary-100 p-3 rounded-lg"
-            onPress={handleStartClass}
+            onPress={countdownActive ? handlePauseClass : handleStartClass}
           >
-            <Text className="text-white text-2xl text-center font-bold">Start Now</Text>
+            <Text className="text-white text-2xl text-center font-bold">
+              {countdownActive ? (isPaused ? "Resume" : "Pause") : "Start Now"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

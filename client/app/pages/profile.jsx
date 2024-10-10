@@ -197,7 +197,7 @@ const Profile = () => {
           className="absolute top-10 left-4 z-10 p-2"
           onPress={() => setBack(true)}
         >
-          <Text className="text-lg font-bold text-purple-500">
+          <Text className="text-lg font-bold text-secondary-100">
             Back to Home
           </Text>
         </TouchableOpacity>
@@ -215,7 +215,7 @@ const Profile = () => {
           {profile.email}
         </Text>
         <TouchableOpacity onPress={pickImage} disabled={uploading}>
-          <View className="bg-purple-500 px-4 py-2 rounded-lg">
+          <View className="bg-secondary-100 px-4 py-2 rounded-lg">
             <Text className="text-white font-semibold">
               {uploading ? "Uploading..." : "Edit Profile Picture"}
             </Text>
