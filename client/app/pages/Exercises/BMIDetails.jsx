@@ -26,7 +26,7 @@ const BMIDetails = ({ visible, onClose, onDelete }) => {
   const handleDeleteBMIResults = () => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete your BMI results?",
+      "Are you sure you want to delete your BMI result details? Warning: Just for you section will be removed !",
       [
         {
           text: "Cancel",

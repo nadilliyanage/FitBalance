@@ -108,7 +108,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        className="mt-6 h-16 flex"
+        className="mt-5 h-16 flex"
       >
         {/* Conditionally render the "Just for You" tab */}
         {hasBMIResult && (
