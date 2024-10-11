@@ -48,10 +48,13 @@ const SavedStressRate = () => {
 
   if (!stressData) {
     return (
-      <View className="p-4 bg-white rounded-lg shadow-md items-center">
+      <View className="p-4 bg-white rounded-lg shadow-md items-center my-4 ml-4">
         <TouchableOpacity onPress={() => navigation.navigate("Relaxations")}>
-          <Text className="text-lg text-gray-600">
+          <Text className="text-xl font-bold text-secondary-100 text-center">
             Do the Daily Quiz to see Stress Rate
+          </Text>
+          <Text className=" font-bold text-gray-400 text-center">
+            Tap to do Daily Quiz
           </Text>
         </TouchableOpacity>
       </View>

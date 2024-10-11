@@ -134,6 +134,12 @@ const SleepTracker = () => {
         </Text>
       </Text>
 
+      {timeFrame === "weekly" && (
+        <Text className="text-gray-600 text-center">
+          Click on the graph customize your sleep data
+        </Text>
+      )}
+
       {timeFrame === "monthly" && (
         <View className="mb-4">
           <Picker
@@ -206,7 +212,7 @@ const SleepTracker = () => {
       )} */}
 
       <View className="mt-2">
-        <Text className="text-gray-600 text-center">
+        <Text className="text-black font-bold text-center">
           Average Sleep: {averageSleep.toFixed(2)} hours
         </Text>
       </View>
@@ -222,7 +228,7 @@ const SleepTracker = () => {
           intensity={180} // Adjust the intensity of the blur
           style={{ flex: 1 }} // Make sure it covers the entire modal
         >
-          <View className="flex-1 justify-center items-center  bg-black/40">
+          <View className="flex-1 justify-center items-center bg-black/40">
             <View className="w-4/5 bg-white rounded-lg p-4 shadow-2xl shadow-black">
               <Text className="text-lg font-bold mb-4">
                 Enter Your Sleep Data
@@ -232,13 +238,22 @@ const SleepTracker = () => {
                   key={index}
                   value={sleepHour}
                   onChangeText={(text) => {
+                    // Allow only numbers and limit to a maximum of 24
+                    let numericValue = text.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+
+                    // Check if the value exceeds 24, if so, set it to 24
+                    if (parseInt(numericValue) > 24) {
+                      numericValue = "24";
+                    }
+
                     const updatedData = [...customSleepData];
-                    updatedData[index] = text;
+                    updatedData[index] = numericValue;
                     setCustomSleepData(updatedData);
                   }}
                   placeholder={`Day ${index + 1} (hours)`}
                   keyboardType="numeric"
                   className="border border-gray-300 rounded p-2 mb-2"
+                  maxLength={2} // Limit input to 2 characters
                 />
               ))}
 

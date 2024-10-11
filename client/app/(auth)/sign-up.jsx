@@ -22,6 +22,7 @@ const SignUp = () => {
       Toast.show({
         type: "error",
         text1: "All fields are required!",
+        text2: "Please fill in all fields",
       });
       return;
     }
@@ -45,6 +46,7 @@ const SignUp = () => {
       Toast.show({
         type: "success",
         text1: "Account created successfully!",
+        text2: "Welcome to FitBalance360",
       });
 
       console.log("User created and details saved to Firestore");
@@ -77,7 +79,7 @@ const SignUp = () => {
           </Text>
 
           <FormField
-            title="Username"
+            title="Your Name"
             value={username}
             handleChangeText={setName}
             otherStyles="mt-7"
