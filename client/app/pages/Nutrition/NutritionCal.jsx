@@ -238,7 +238,7 @@ const NutritionCalculator = () => {
           {addedFoods.map((item, index) => (
             <View
               key={index}
-              className="flex-row justify-between items-center bg-secondary-100 p-4 shadow-md rounded-2xl mb-2"
+              className="flex-row justify-between items-center bg-purple-400 p-4 shadow-md rounded-2xl mb-2"
             >
               <Text className="ml-4 text-xl text-white font-semibold">
                 {item.name} - {item.weight}g
