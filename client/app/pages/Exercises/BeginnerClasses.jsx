@@ -68,8 +68,8 @@ const BeginnerClasses = ({ filterText = "", searchBy = "" }) => {
           />
         ))
       ) : (
-        <View style={{ alignItems: "center" }}>
-          <Text>No classes found</Text>
+        <View>
+          <Text className="text-center">No classes found</Text>
         </View>
       )}
 

@@ -26,7 +26,7 @@ const BMIDetails = ({ visible, onClose, onDelete }) => {
   const handleDeleteBMIResults = () => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete your BMI results?",
+      "Are you sure you want to delete your BMI result details? Warning: Just for you section will be removed !",
       [
         {
           text: "Cancel",
@@ -63,7 +63,7 @@ const BMIDetails = ({ visible, onClose, onDelete }) => {
         intensity={180} // Adjust the intensity of the blur
         style={{ flex: 1 }} // Make sure it covers the entire modal
       >
-        <View className="flex-1 justify-center items-center bg-transparent">
+        <View className="flex-1 justify-center items-center bg-black/50">
           <View className="bg-white w-11/12 p-6 rounded-lg shadow-2xl shadow-black">
             {/* Use flex-row to place heading and button in the same line */}
             <View className="flex-row justify-between items-center mb-4">
@@ -106,7 +106,7 @@ const BMIDetails = ({ visible, onClose, onDelete }) => {
             </View>
             <TouchableOpacity
               onPress={onClose}
-              className="mt-6 bg-purple-500 rounded-full p-2"
+              className="mt-6 bg-secondary-100 rounded-full p-2"
             >
               <Text className="text-white text-center">Close</Text>
             </TouchableOpacity>
