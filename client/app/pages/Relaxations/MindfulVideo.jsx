@@ -115,6 +115,16 @@ const MindfulVideo = () => {
               Mindful Videos
             </Text>
           </View>
+          <View className="flex flex-col">
+            <Text className="text-xl font-bold mt-4">
+              What is Mindful video?
+            </Text>
+            <Text className="text-sm font-pregular mx-2 mb-2">
+              Mindful video promotes relaxation and present-moment awareness
+              with soothing melodies and gentle rhythms, helping to reduce
+              stress and enhance mindfulness.
+            </Text>
+          </View>
           {loading ? (
             <View className="flex justify-center items-center">
               <ActivityIndicator size="large" color="#6200ee" />

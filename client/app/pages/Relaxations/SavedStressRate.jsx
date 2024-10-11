@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Progress from "react-native-progress";
+import { Svg, Circle } from "react-native-svg"; // Importing Svg and Circle from react-native-svg
 import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
 
 const SavedStressRate = () => {
@@ -46,34 +46,62 @@ const SavedStressRate = () => {
     return "#ccc"; // Default color if none match
   };
 
+  if (!stressData) {
+    return (
+      <View className="p-4 bg-white rounded-lg shadow-md items-center">
+        <TouchableOpacity onPress={() => navigation.navigate("Relaxations")}>
+          <Text className="text-lg text-gray-600">
+            Do the Daily Quiz to see Stress Rate
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Calculate the percentage for the arc progress
+  const circumference = 2 * Math.PI * 60; // Adjust radius as needed (60 is the radius)
+  const percentage = Math.min(stressData.progress, 1); // Ensure progress is between 0 and 1
+  const strokeDashoffset = circumference - percentage * circumference;
+
   return (
     <View className="p-4 bg-white rounded-lg shadow-md items-center">
       <TouchableOpacity onPress={() => navigation.navigate("Relaxations")}>
-        {stressData ? (
-          <View className="items-center">
-            <Text className={`text-lg font-bold`}>Stress Level</Text>
+        <View className="items-center">
+          <Text className={`text-lg font-bold`}>Stress Level</Text>
 
-            {/* Circle Progress Bar */}
-            <View className="mt-2">
-              <Progress.Circle
-                progress={stressData.progress} // Progress should be a decimal (e.g., 0.75 for 75%)
-                size={125} // Size of the circle
-                thickness={15} // Thickness of the progress arc
-                color={getProgressBarColor(stressData.level)} // Dynamic color based on stress level
-                showsText={true} // Display the percentage inside the circle
-                formatText={() => `${Math.round(stressData.progress * 100)}%`} // Custom text display
-                textStyle={{ fontSize: 18, fontWeight: "bold" }} // Text style inside the circle
+          {/* Circle Progress Bar using SVG */}
+          <View className="mt-2">
+            <Svg height={140} width={140}>
+              <Circle
+                cx="70" // Center x
+                cy="70" // Center y
+                r="60" // Radius of the circle
+                stroke="#e5e7eb" // Background circle color
+                strokeWidth="15"
+                fill="none"
               />
-            </View>
-            <Text className={`text-lg  ${getStressColor(stressData.level)}`}>
-              {stressData.level}
+              <Circle
+                cx="70"
+                cy="70"
+                r="60"
+                stroke={getProgressBarColor(stressData.level)} // Dynamic color based on stress level
+                strokeWidth="15"
+                fill="none"
+                strokeDasharray={circumference} // Set the total circumference
+                strokeDashoffset={strokeDashoffset} // Control the visible arc length
+                rotation="-90" // Rotate to start from the top
+                originX="70" // Center point x for rotation
+                originY="70" // Center point y for rotation
+              />
+            </Svg>
+            <Text className="absolute top-14 left-12 text-lg font-bold transform -translate-x-1/2 -translate-y-1/2">
+              {Math.round(stressData.progress * 100)}%
             </Text>
           </View>
-        ) : (
-          <Text className="text-lg text-gray-600">
-            No saved stress data available.
+          <Text className={`text-lg ${getStressColor(stressData.level)}`}>
+            {stressData.level}
           </Text>
-        )}
+        </View>
       </TouchableOpacity>
     </View>
   );
