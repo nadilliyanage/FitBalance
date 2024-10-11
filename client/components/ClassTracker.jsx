@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 
 const ProgressTracker = () => {
   const [progress, setProgress] = useState(0); // Default progress value
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchProgress = async () => {
@@ -44,14 +46,16 @@ const ProgressTracker = () => {
   }
 
   return (
-    <View className="p-2 bg-purple-400 rounded-xl w-full flex-row justify-between items-center">
-      <Text className="text-lg font-semibold text-white mx-2">
-        Progress: {progressMessage}
-      </Text>
-      <Text className="mx-2">
-        <Ionicons name="arrow-forward-outline" size={24} color="white" />
-      </Text>
-    </View>
+    <TouchableOpacity onPress={() => navigation.navigate("Exercises")}>
+      <View className="p-2 bg-purple-400 rounded-xl w-full flex-row justify-between items-center">
+        <Text className="text-lg font-semibold text-white mx-2">
+          Progress: {progressMessage}
+        </Text>
+        <Text className="mx-2">
+          <Ionicons name="arrow-forward-outline" size={24} color="white" />
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
