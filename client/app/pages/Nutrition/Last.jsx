@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const LastNutritionSummary = () => {
   const [lastCalculation, setLastCalculation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     // Initial load of the calculation data
@@ -43,9 +45,11 @@ const LastNutritionSummary = () => {
   if (!lastCalculation) {
     return (
       <View className="flex-1 items-center justify-center bg-purple-200 rounded-xl p-5 shadow-lg">
-        <Text className="text-2xl font-bold text-purple-700">
-          Add Foods to see Summary
-        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Nutrition")}>
+          <Text className="text-2xl font-bold text-purple-700 text-center">
+            Add Foods to see the Summary
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -55,63 +59,72 @@ const LastNutritionSummary = () => {
 
   return (
     <View className="flex-1 items-center bg-purple-200 rounded-2xl p-5 shadow-lg mx-2 my-2">
-      {/* Calorie Info */}
-      {/* <Text className="text-6xl font-bold text-indigo-600">{calories.toFixed(2)} Kcal</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Nutrition")}>
+        <Text className={`text-lg font-bold text-center mb-1`}>
+          Nutrients from your Previous Meal
+        </Text>
+        {/* Calorie Info */}
+        {/* <Text className="text-6xl font-bold text-indigo-600">{calories.toFixed(2)} Kcal</Text>
       <Text className="text-xl font-bold text-gray-500">of 2000 kcal</Text> */}
 
-      {/* Macros */}
-      <View className="flex-row justify-around w-full mt-2">
-        {/* Protein */}
-        <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
-          <Text className="text-xl font-bold mb-2 text-blue-600">Protein</Text>
-          <Text className="text-lg text-gray-700 mb-2">
-            {protein.toFixed(1)} / 90g
-          </Text>
-          <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
-            <View
-              className="h-full rounded-full"
-              style={{
-                width: `${(protein / 90) * 100}%`,
-                backgroundColor: "#4A90E2",
-              }}
-            />
+        {/* Macros */}
+        <View className="flex-row justify-around w-full mt-2">
+          {/* Protein */}
+          <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
+            <Text className="text-xl font-bold mb-2 text-blue-600">
+              Protein
+            </Text>
+            <Text className="text-lg text-gray-700 mb-2">
+              {protein.toFixed(1)} / 90g
+            </Text>
+            <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+              <View
+                className="h-full rounded-full"
+                style={{
+                  width: `${(protein / 90) * 100}%`,
+                  backgroundColor: "#4A90E2",
+                }}
+              />
+            </View>
           </View>
-        </View>
 
-        {/* Fats */}
-        <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
-          <Text className="text-xl font-bold mb-2 text-pink-600">Fats</Text>
-          <Text className="text-lg text-gray-700 mb-2">
-            {fat.toFixed(1)} / 70g
-          </Text>
-          <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden ">
-            <View
-              className="h-full rounded-full"
-              style={{
-                width: `${(fat / 70) * 100}%`,
-                backgroundColor: "#D5006D",
-              }}
-            />
+          {/* Fats */}
+          <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
+            <Text className="text-xl font-bold mb-2 text-pink-600">Fats</Text>
+            <Text className="text-lg text-gray-700 mb-2">
+              {fat.toFixed(1)} / 70g
+            </Text>
+            <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden ">
+              <View
+                className="h-full rounded-full"
+                style={{
+                  width: `${(fat / 70) * 100}%`,
+                  backgroundColor: "#D5006D",
+                }}
+              />
+            </View>
           </View>
-        </View>
 
-        {/* Carbs */}
-        <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
-          <Text className="text-xl font-bold mb-2 text-yellow-600">Carbs</Text>
-          <Text className="text-lg text-gray-700 mb-2">
-            {carbs.toFixed(1)} / 110g
-          </Text>
-          <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
-            <View
-              className="h-full rounded-full"
-              style={{
-                width: `${(carbs / 110) * 100}%`,
-                backgroundColor: "#FBC02D",
-              }}
-            />
+          {/* Carbs */}
+          <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
+            <Text className="text-xl font-bold mb-2 text-yellow-600">
+              Carbs
+            </Text>
+            <Text className="text-lg text-gray-700 mb-2">
+              {carbs.toFixed(1)} / 110g
+            </Text>
+            <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+              <View
+                className="h-full rounded-full"
+                style={{
+                  width: `${(carbs / 110) * 100}%`,
+                  backgroundColor: "#FBC02D",
+                }}
+              />
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

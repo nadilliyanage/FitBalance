@@ -11,6 +11,7 @@ import SavedStressRate from "../pages/Relaxations/SavedStressRate";
 import WeeklySleepGraph from "../pages/Relaxations/WeeklySleepGraph";
 import Last from "../pages/Nutrition/Last";
 import BMIGraph from "../pages/Exercises/BMIGraph";
+import ClassTracker from "../../components/ClassTracker";
 
 const Home = () => {
   // Global state
@@ -47,11 +48,11 @@ const Home = () => {
 
   return (
     <SafeAreaView className=" flex-1">
-      <View className=" bg-secondary-100 rounded-b-3xl p-6 space-y-6">
-        <View className="justify-between items-start flex-row ">
+      <View className=" bg-secondary-100 rounded-b-xl p-2 space-y-6">
+        <View className="justify-between items-center flex-row ">
           <TouchableOpacity
             onPress={() => setShowProfile(true)} // Use onPress instead of handlePress
-            className="bg-primary rounded-full p-1 absolute right-4"
+            className="bg-primary rounded-full p-1 absolute right-4 "
           >
             <Image
               source={images.profile}
@@ -59,13 +60,20 @@ const Home = () => {
               className="w-12 h-12 rounded-full"
             />
           </TouchableOpacity>
-          <View>
-            <Text className="font-pmedium text-sm text-gray-100">
-              Welcome Back
-            </Text>
-            <Text className="text-2xl font-bold text-white">
-              {userName} {/* Display the user's username */}
-            </Text>
+          <View className="flex flex-row">
+            <Image
+              source={images.logo}
+              resizeMode="cover"
+              className="w-16 h-16 bg-white rounded-lg m-2"
+            />
+            <View className="flex justify-center">
+              <Text className="font-pmedium text-sm text-gray-100">
+                Welcome Back
+              </Text>
+              <Text className="text-2xl font-bold text-white">
+                {userName} {/* Display the user's username */}
+              </Text>
+            </View>
           </View>
         </View>
         {/* <SearchInput /> */}
@@ -86,7 +94,9 @@ const Home = () => {
                 <BMIGraph />
               </View>
             </View>
-
+            <View className="m-2">
+              <ClassTracker />
+            </View>
             <WeeklySleepGraph />
           </View>
         )}

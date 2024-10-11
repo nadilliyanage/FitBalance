@@ -35,7 +35,9 @@ const BMIDetails = () => {
   if (!bmiResult) {
     return (
       <View className="flex-1 justify-center items-center">
-        <Text>Add You BMI details</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Exercises")}>
+          <Text>Add Your BMI details to see the summary</Text>
+        </TouchableOpacity>
       </View>
     ); // Show if no data is fetched
   }
