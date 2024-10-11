@@ -70,7 +70,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
   return (
   
-    <View className="flex-1 px-5 pt-2 bg-white">
+    <View className="flex-1 px-5 pt-10 bg-white">
       
       <View className="items-center">
         <Text className="text-3xl font-bold text-center text-black">Exercises</Text>
@@ -114,7 +114,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         {hasBMIResult && (
           <TouchableOpacity
             onPress={() => setSelectedLevel("JustForYou")}
-            className={`px-4 py-2 mx-2 rounded-full h-10 ${
+            className={`px-4 py-2 mr-2 rounded-full h-10 ${
               selectedLevel === "JustForYou"
                 ? "bg-secondary-100"
                 : "bg-white border border-gray-400"
@@ -166,7 +166,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Advanced")}
-          className={`px-4 py-2 mx-2 rounded-full h-10 ${
+          className={`px-4 py-2 ml-2 rounded-full h-10 ${
             selectedLevel === "Advanced"
               ? "bg-secondary-100"
               : "bg-white border border-gray-400"
