@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   Button,
   BackHandler,
+  Modal,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState, lazy, Suspense } from "react";
 import { useRouter } from "expo-router";
@@ -16,8 +19,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAuth, signOut, updateProfile } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Import Firestore
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const LazyHome = lazy(() => import("../(tabs)/home"));
 
@@ -30,7 +34,11 @@ const Profile = () => {
     profileImage: "",
   });
   const [uploading, setUploading] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [back, setBack] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false); // Logout modal state
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -49,6 +57,7 @@ const Profile = () => {
               email: userData.email || "No Email",
               profileImage: userData.profileImage || images.profile,
             });
+            setNewName(userData.username || "");
           } else {
             console.log("No such user in Firestore");
           }
@@ -61,6 +70,7 @@ const Profile = () => {
               email: storedUser.email || "No Email",
               profileImage: storedUser.profileImage || images.profile,
             });
+            setNewName(storedUser.name || "");
           }
         }
       } catch (error) {
@@ -99,8 +109,6 @@ const Profile = () => {
       }
       const blob = await response.blob();
 
-      console.log("Blob created:", blob); // Log blob for debugging
-
       const storage = getStorage();
       const storageRef = ref(storage, `profile_pictures/${user.uid}`);
 
@@ -108,6 +116,9 @@ const Profile = () => {
       const downloadURL = await getDownloadURL(storageRef);
 
       await updateProfile(user, { photoURL: downloadURL });
+      await updateDoc(doc(getFirestore(), "users", user.uid), {
+        profileImage: downloadURL,
+      });
 
       setProfile((prev) => ({ ...prev, profileImage: downloadURL }));
       setState((prev) => ({
@@ -129,7 +140,7 @@ const Profile = () => {
         text2: "Your profile picture has been updated.",
       });
     } catch (error) {
-      console.error("Error uploading image:", error); // Log full error object
+      console.error("Error uploading image:", error);
       Toast.show({
         type: "error",
         text1: "Upload failed",
@@ -140,7 +151,48 @@ const Profile = () => {
     }
   };
 
+  const handleUpdateProfile = async () => {
+    setUpdating(true);
+    try {
+      await updateProfile(user, { displayName: newName });
+      await updateDoc(doc(getFirestore(), "users", user.uid), {
+        username: newName,
+      });
+
+      setProfile((prev) => ({ ...prev, name: newName }));
+      setState((prev) => ({
+        ...prev,
+        user: { ...prev.user, name: newName },
+      }));
+
+      await AsyncStorage.setItem(
+        "@auth",
+        JSON.stringify({
+          ...state,
+          user: { ...state.user, name: newName },
+        })
+      );
+
+      Toast.show({
+        type: "success",
+        text1: "Profile updated",
+        text2: "Your name has been updated.",
+      });
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Toast.show({
+        type: "error",
+        text1: "Update failed",
+        text2: error.message || "Failed to update profile.",
+      });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const logout = async () => {
+    setLogoutModalVisible(false); // Close the logout confirmation modal
     try {
       await signOut(auth);
       await AsyncStorage.removeItem("@auth");
@@ -164,6 +216,10 @@ const Profile = () => {
         message: error.message,
       });
     }
+  };
+
+  const confirmLogout = () => {
+    setLogoutModalVisible(true); // Open logout confirmation modal
   };
 
   useFocusEffect(
@@ -197,31 +253,124 @@ const Profile = () => {
           className="absolute top-10 left-4 z-10 p-2"
           onPress={() => setBack(true)}
         >
-          <Text className="text-lg font-bold text-secondary-100">
-            Back to Home
+          <Text className="text-lg font-bold text-secondary-100 p-2">
+            <Ionicons
+              className="text-secondary-100"
+              name="arrow-back-circle-outline"
+              size={34}
+            />
           </Text>
         </TouchableOpacity>
-        <Image
-          source={
-            profile.profileImage
-              ? { uri: profile.profileImage }
-              : images.profile
-          }
-          className="w-36 h-36 rounded-full border-2 border-gray-200 mb-4"
-          resizeMode="cover"
-        />
-        <Text className="text-2xl font-semibold mb-1">{profile.name}</Text>
+
+        {/* Make the Image component tappable */}
+        <TouchableOpacity onPress={pickImage}>
+          {uploading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <Image
+              source={
+                typeof profile.profileImage === "string" &&
+                profile.profileImage !== ""
+                  ? { uri: profile.profileImage }
+                  : images.profile // Fallback to a default profile image
+              }
+              className="w-36 h-36 rounded-full border-2 border-gray-200 mb-4"
+              resizeMode="cover"
+            />
+          )}
+        </TouchableOpacity>
+
+        <Text className="text-2xl font-bold mb-1">{profile.name}</Text>
         <Text className="text-sm font-medium text-gray-500 mb-5">
           {profile.email}
         </Text>
-        <TouchableOpacity onPress={pickImage} disabled={uploading}>
-          <View className="bg-secondary-100 px-4 py-2 rounded-lg">
-            <Text className="text-white font-semibold">
-              {uploading ? "Uploading..." : "Edit Profile Picture"}
-            </Text>
-          </View>
+
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          className="bg-secondary-300 px-4 py-3  rounded-lg mt-4 w-3/4"
+        >
+          <Text className="text-white font-semibold text-center">
+            Edit your Name
+          </Text>
         </TouchableOpacity>
-        <Button title="Logout" onPress={logout} color="#841584" />
+
+        <TouchableOpacity
+          onPress={confirmLogout} // Show logout confirmation modal
+          className="bg-red-500 px-4 py-3 rounded-lg mt-4  w-3/4"
+        >
+          <Text className="text-white font-semibold text-center">Logout</Text>
+        </TouchableOpacity>
+
+        {/* Edit Name Modal */}
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black/50 ">
+            <View className="bg-white p-5 rounded-lg w-11/12">
+              <Text className="text-xl font-semibold mb-2">Edit Your Name</Text>
+              <TextInput
+                value={newName}
+                onChangeText={setNewName}
+                placeholder="Enter your new name"
+                className="border-b-2 border-gray-300 mb-4 p-2 font-semibold"
+              />
+              {updating ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
+                <TouchableOpacity
+                  onPress={handleUpdateProfile}
+                  className="bg-secondary-300 p-2 rounded-lg mb-2"
+                >
+                  <Text className="text-white font-semibold text-center">
+                    Update
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                className="bg-gray-400 p-2 rounded-lg mb-2"
+              >
+                <Text className="text-white font-semibold text-center">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Logout Confirmation Modal */}
+        <Modal
+          visible={logoutModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setLogoutModalVisible(false)}
+        >
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <View className="bg-white p-5 rounded-lg w-11/12">
+              <Text className="text-lg font-semibold mb-2">
+                Are you sure you want to log out?
+              </Text>
+              <View className="flex-row-reverse">
+                <TouchableOpacity
+                  className="bg-red-600 px-6 py-2 rounded-lg m-2"
+                  onPress={logout}
+                >
+                  <Text className="text-white font-semibold">Yes</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  className="bg-gray-400 px-6 py-2 rounded-lg m-2"
+                  onPress={() => setLogoutModalVisible(false)}
+                >
+                  <Text className="text-white font-semibold">No</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
