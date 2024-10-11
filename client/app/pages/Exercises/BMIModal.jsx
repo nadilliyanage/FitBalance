@@ -128,10 +128,10 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
       onRequestClose={onClose}
     >
       <BlurView
-        tint="light"
-        intensity={100}
-        className="flex-1 justify-center items-center"
+        intensity={180} // Adjust the intensity of the blur
+        style={{ flex: 1 }} // Make sure it covers the entire modal
       >
+        <View className="flex-1 justify-center items-center bg-black/50">
         <View className="bg-white p-4 rounded-2xl w-80 shadow-2xl shadow-black">
           <Text className="text-center text-2xl font-bold mb-4">Your BMI:</Text>
           {bmiResult && (
@@ -193,7 +193,7 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
           {/* Navigate Button */}
           <TouchableOpacity
             onPress={() => setBack(true)}
-            className="bg-green-600 py-2 rounded-lg mt-4 flex-row items-center justify-center"
+            className="bg-secondary-100 py-2 rounded-lg mt-4 flex-row items-center justify-center"
           >
             <Text className="text-white font-bold text-lg mr-2">
               Let's Start Journey
@@ -206,12 +206,13 @@ const BMIModal = ({ visible, onClose, bmiResult, navigation }) => {
           {/* Close Button */}
           <TouchableOpacity
             onPress={onClose}
-            className="bg-purple-700 py-2 rounded-lg mt-4"
+            className="bg-white py-2 rounded-lg mt-4"
           >
-            <Text className="text-center text-white font-bold text-lg">
+            <Text className="text-center  text-secondary-100 font-bold text-lg">
               Close
             </Text>
           </TouchableOpacity>
+        </View>
         </View>
       </BlurView>
     </Modal>

@@ -8,9 +8,9 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ClassDetailsModal = ({
   isVisible,
@@ -20,10 +20,11 @@ const ClassDetailsModal = ({
 }) => {
   const [activeTab, setActiveTab] = useState("Overview");
   const [remainingTime, setRemainingTime] = useState(0);
-  const [progress, setProgress] = useState(0); // Track progress
-  const [countdownActive, setCountdownActive] = useState(false); // Track countdown state
+  const [originalDuration, setOriginalDuration] = useState(0); // New state to store original duration
+  const [progress, setProgress] = useState(0);
+  const [countdownActive, setCountdownActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Load progress from AsyncStorage when the modal is visible
   useEffect(() => {
     const loadProgress = async () => {
       if (isVisible) {
@@ -32,7 +33,7 @@ const ClassDetailsModal = ({
           if (savedProgress !== null) {
             setProgress(JSON.parse(savedProgress));
           } else {
-            setProgress(0); // Reset progress if nothing is saved
+            setProgress(0);
           }
         } catch (error) {
           console.error("Error loading progress", error);
@@ -45,12 +46,12 @@ const ClassDetailsModal = ({
 
   useEffect(() => {
     let timer;
-    if (countdownActive) {
+    if (countdownActive && !isPaused) {
       timer = setInterval(() => {
         setRemainingTime((prevTime) => {
           if (prevTime <= 0) {
             clearInterval(timer);
-            return 0; // Reset remaining time when countdown completes
+            return 0;
           }
           return prevTime - 1;
         });
@@ -58,38 +59,53 @@ const ClassDetailsModal = ({
     }
 
     return () => clearInterval(timer);
-  }, [countdownActive]);
+  }, [countdownActive, isPaused]);
 
   const handleStartClass = () => {
-    const durationInSeconds = Math.max(classDetails.duration || 0, 0);
-    setRemainingTime(durationInSeconds);
-    setCountdownActive(true); // Start the countdown
+    if (classDetails) {
+      const durationInSeconds = Math.max(classDetails.duration || 0, 0);
+      setOriginalDuration(durationInSeconds); // Set original duration
+      setRemainingTime(durationInSeconds);
+      setCountdownActive(true);
+      setIsPaused(false);
+    }
+  };
+
+  const handlePauseClass = () => {
+    setIsPaused((prev) => !prev);
+  };
+
+  const handleResetClass = () => {
+    setCountdownActive(false);
+    setIsPaused(false);
+    setRemainingTime(originalDuration); // Reset to original duration
   };
 
   const checkAndIncreaseProgress = async () => {
-    const durationInSeconds = Math.max(classDetails.duration || 0, 0);
-    if (remainingTime <= 0) {
-      // Only increase progress if the class duration has completed
-      setProgress((prevProgress) => {
-        const newProgress = prevProgress + 1;
-        saveProgressToStorage(newProgress);
-        Alert.alert("Well done!", "You have completed a class!", [
-          {
-            text: "OK",
-            onPress: () => {
-              onClose(); // Close the modal when OK is pressed
-              onStartClass(classDetails.duration, classDetails.Name); // Refresh the JustForYouPage
+    if (classDetails) {
+      const durationInSeconds = Math.max(classDetails.duration || 0, 0);
+      if (remainingTime <= 0) {
+        setProgress((prevProgress) => {
+          const newProgress = prevProgress + 1;
+          saveProgressToStorage(newProgress);
+          Alert.alert("Well done!", "You have completed a class!", [
+            {
+              text: "OK",
+              onPress: () => {
+                onClose();
+                onStartClass(classDetails.duration, classDetails.Name);
+              },
             },
-          },
-        ]);
-        return newProgress;
-      });
+          ]);
+          return newProgress;
+        });
+      }
     }
   };
 
   const saveProgressToStorage = async (newProgress) => {
     try {
-      await AsyncStorage.setItem("userProgress", JSON.stringify(newProgress)); // Save progress
+      await AsyncStorage.setItem("userProgress", JSON.stringify(newProgress));
     } catch (error) {
       console.error("Error saving progress to storage", error);
     }
@@ -97,8 +113,8 @@ const ClassDetailsModal = ({
 
   useEffect(() => {
     if (remainingTime === 0 && countdownActive) {
-      setCountdownActive(false); // Stop countdown
-      checkAndIncreaseProgress(); // Check and increase progress
+      setCountdownActive(false);
+      checkAndIncreaseProgress();
     }
   }, [remainingTime, countdownActive]);
 
@@ -163,7 +179,7 @@ const ClassDetailsModal = ({
 
   return (
     <Modal visible={isVisible} animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-white px-1">
         {/* Top Section with Back Arrow */}
         <View className="flex-row items-center px-4 py-3">
           <TouchableOpacity onPress={onClose} className="mr-4">
@@ -215,47 +231,63 @@ const ClassDetailsModal = ({
           ))}
         </View>
 
-        {/* Dynamic Content Based on Active Tab */}
-        <ScrollView className="flex-1">{renderTabContent()}</ScrollView>
+        {/* Render the content of the active tab */}
+        <ScrollView>{renderTabContent()}</ScrollView>
 
-        <View className="p-4">
-          <Text className="text-xl font-semibold text-gray-800 mb-2 text-center">
-            Time: <Text className="text-3xl">{Math.floor(remainingTime / 60)}:{remainingTime % 60 < 10 ? `0${remainingTime % 60}` : remainingTime % 60}</Text>
-          </Text>
-        </View>
-
-        {/* Start Now Button */}
-        <View className="p-4">
-          <TouchableOpacity
-            className="bg-secondary-100 p-3 rounded-lg"
-            onPress={handleStartClass}
-          >
-            <Text className="text-white text-2xl text-center font-bold">Start Now</Text>
-          </TouchableOpacity>
+        {/* Countdown Timer and Buttons */}
+        <View className="px-4 py-4">
+          {countdownActive ? (
+            <>
+              <Text className="text-lg font-semibold text-center mb-4">Remaining Time: <Text className="text-3xl">{remainingTime} seconds</Text></Text>
+              <View className="flex-row justify-between mt-2">
+                <TouchableOpacity
+                  onPress={handlePauseClass}
+                  className="bg-purple-500 px-4 py-4 rounded-lg flex-row items-center justify-center"
+                >
+                  <Ionicons name={isPaused ? "play-outline" : "pause-outline"} size={25} color="white" />
+                  {/* <Text className="text-white font-bold text-base">{isPaused ? "Resume" : "Pause"}</Text> */}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleResetClass} // Call reset function here
+                  className="bg-red-500 px-4 py-4 rounded-lg"
+                >
+                  <FontAwesome name="repeat" size={25} color="white"/>
+                  {/* <Text className="text-white">Reset</Text> */}
+                </TouchableOpacity>
+               </View>
+            </>
+          ) : (
+            <TouchableOpacity onPress={handleStartClass} className="bg-secondary-100 px-4 py-4 rounded-lg flex-row items-center justify-center">
+              <Feather name="play" size={25} color="white"/>
+              <Text className="text-white text-center font-bold text-xl ml-4">Start Class</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </Modal>
   );
 };
 
+// Prop Types
 ClassDetailsModal.propTypes = {
   isVisible: PropTypes.bool.isRequired,
   // classDetails: PropTypes.shape({
   //   Name: PropTypes.string.isRequired,
-  //   instructor: PropTypes.string.isRequired,
   //   description: PropTypes.string.isRequired,
-  //   prerequisites: PropTypes.string,
-  //   additionalBenefits: PropTypes.string,
+  //   instructor: PropTypes.string.isRequired,
+  //   instructorBio: PropTypes.string,
   //   duration: PropTypes.number.isRequired,
   //   equipmentNeeded: PropTypes.string,
+  //   additionalBenefits: PropTypes.string,
+  //   prerequisites: PropTypes.string,
+  //   image: PropTypes.any.isRequired,
   //   reviews: PropTypes.arrayOf(
   //     PropTypes.shape({
   //       reviewer: PropTypes.string.isRequired,
   //       comment: PropTypes.string.isRequired,
   //     })
   //   ),
-  //   image: PropTypes.node.isRequired,
-  // }).isRequired,
+  // }),
   onClose: PropTypes.func.isRequired,
   onStartClass: PropTypes.func.isRequired,
 };

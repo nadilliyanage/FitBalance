@@ -69,9 +69,11 @@ const ExerciseMainPage = ({ onBMIClick }) => {
   };
 
   return (
+  
     <View className="flex-1 px-5 pt-10 bg-white">
+      
       <View className="items-center">
-        <Text className="text-3xl font-bold text-center">Exercises</Text>
+        <Text className="text-3xl font-bold text-center text-black">Exercises</Text>
 
         {!hasBMIResult && (
           <CustomButton
@@ -87,7 +89,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
             <CustomButton
               title="Calculate BMI"
               handlePress={onBMIClick}
-              containerStyles="flex-1 bg-purple-500 rounded-xl p-2 mr-2"
+              containerStyles="flex-1 bg-secondary-100 rounded-xl p-2 mr-2"
               textStyle="text-white text-lg text-center"
             />
             <TouchableOpacity
@@ -106,15 +108,15 @@ const ExerciseMainPage = ({ onBMIClick }) => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        className="mt-6 h-16 flex"
+        className="mt-5 h-16 flex"
       >
         {/* Conditionally render the "Just for You" tab */}
         {hasBMIResult && (
           <TouchableOpacity
             onPress={() => setSelectedLevel("JustForYou")}
-            className={`px-4 py-2 mx-2 rounded-full h-10 ${
+            className={`px-4 py-2 mr-2 rounded-full h-10 ${
               selectedLevel === "JustForYou"
-                ? "bg-purple-500"
+                ? "bg-secondary-100"
                 : "bg-white border border-gray-400"
             }`}
           >
@@ -132,7 +134,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           onPress={() => setSelectedLevel("Beginner")}
           className={`px-4 py-2 mx-2 rounded-full h-10 ${
             selectedLevel === "Beginner"
-              ? "bg-purple-500"
+              ? "bg-secondary-100"
               : "bg-white border border-gray-400"
           }`}
         >
@@ -149,7 +151,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           onPress={() => setSelectedLevel("Intermediate")}
           className={`px-4 py-2 mx-2 rounded-full h-10 ${
             selectedLevel === "Intermediate"
-              ? "bg-purple-500"
+              ? "bg-secondary-100"
               : "bg-white border border-gray-400"
           }`}
         >
@@ -164,9 +166,9 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
         <TouchableOpacity
           onPress={() => setSelectedLevel("Advanced")}
-          className={`px-4 py-2 mx-2 rounded-full h-10 ${
+          className={`px-4 py-2 ml-2 rounded-full h-10 ${
             selectedLevel === "Advanced"
-              ? "bg-purple-500"
+              ? "bg-secondary-100"
               : "bg-white border border-gray-400"
           }`}
         >
@@ -182,6 +184,18 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
       {/* Fixed search field and dropdown */}
       <View className="flex-row items-center mt-5 mb-2">
+        
+        <View className="w-[170px]">
+          <Picker
+            selectedValue={searchBy}
+            style={{ height: 30, width: "100%", margin: -10 }}
+            onValueChange={(itemValue) => setSearchBy(itemValue)}
+          >
+            <Picker.Item label="By Class" value="Name" />
+            <Picker.Item label="By Instructor" value="Instructor" />
+          </Picker>
+        </View>
+
         <View className="flex-1 flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
           <Icon name="search" size={20} color="black" />
           <TextInput
@@ -193,17 +207,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
           <TouchableOpacity onPress={() => setSearchText("")} className="ml-2">
             <Icon name="times" size={20} color="black" />
           </TouchableOpacity>
-        </View>
-
-        <View className="ml-3 mr-[-10]" style={{ width: 160 }}>
-          <Picker
-            selectedValue={searchBy}
-            style={{ height: 30, width: "100%" }}
-            onValueChange={(itemValue) => setSearchBy(itemValue)}
-          >
-            <Picker.Item label="By Class Name" value="Name" />
-            <Picker.Item label="By Instructor" value="Instructor" />
-          </Picker>
         </View>
       </View>
 
@@ -222,6 +225,7 @@ const ExerciseMainPage = ({ onBMIClick }) => {
         renderItem={() => renderClasses()} // Render classes based on the selected level
         keyExtractor={(item) => item} // Simple key extractor
         scrollEnabled={true} // Disable scrolling since we already have a ScrollView for the top content
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
