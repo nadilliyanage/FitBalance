@@ -44,10 +44,13 @@ const LastNutritionSummary = () => {
 
   if (!lastCalculation) {
     return (
-      <View className="flex-1 items-center justify-center bg-purple-200 rounded-xl p-5 shadow-lg">
+      <View className="flex-1 items-center justify-center bg-purple-200 rounded-xl p-5 shadow-lg my-2 mx-2">
         <TouchableOpacity onPress={() => navigation.navigate("Nutrition")}>
           <Text className="text-2xl font-bold text-purple-700 text-center">
             Add Foods to see the Summary
+          </Text>
+          <Text className=" font-bold text-gray-400 text-center">
+            Tap to add Foods
           </Text>
         </TouchableOpacity>
       </View>

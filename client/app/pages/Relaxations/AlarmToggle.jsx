@@ -18,10 +18,29 @@ const AlarmToggle = () => {
     const newState = !isEnabled;
     setIsEnabled(newState);
 
-    // Cancel scheduled notifications if the alarm is turned off
-    if (!newState) {
+    if (newState) {
+      // Show toast when turning the alarm on
+      Toast.show({
+        type: "success",
+        text1: "Alarm Enabled",
+        text2: "Alarm has been turned on.",
+        position: "top",
+      });
+
+      // Schedule the alarm with the current alarmTime
+      scheduleAlarm(alarmTime);
+    } else {
+      // Cancel scheduled notifications if the alarm is turned off
       await Notifications.cancelAllScheduledNotificationsAsync();
       await AsyncStorage.removeItem("alarmTime");
+
+      // Show toast when turning the alarm off
+      Toast.show({
+        type: "info",
+        text1: "Alarm Disabled",
+        text2: "Alarm has been turned off.",
+        position: "top",
+      });
     }
 
     // Store the updated state in AsyncStorage
