@@ -147,9 +147,9 @@ const MindfulMusic = () => {
   return (
     <SafeAreaView className="flex bg-white">
       <ScrollView>
-        <View className="flex absolute w-full h-[9%] bg-secondary-100 rounded-b-2xl"></View>
+        <View className="flex absolute w-full h-16 bg-secondary-100 rounded-b-2xl"></View>
         <View className="p-4">
-          <View className="flex flex-row items-center justify-center">
+          <View className="flex flex-row items-center justify-center mb-4">
             <TouchableOpacity
               className="absolute left-2"
               onPress={handleBack} // Use handleBack to show LazyRelaxations
