@@ -58,7 +58,7 @@ const LastNutritionSummary = () => {
   const { calories, protein, fat, carbs } = totalNutrition;
 
   return (
-    <View className="flex-1 items-center bg-purple-200 rounded-2xl p-5 shadow-lg mx-2 my-2">
+    <View className="flex-1 items-center bg-purple-200 rounded-2xl p-4 shadow-lg mx-2 my-2">
       <TouchableOpacity onPress={() => navigation.navigate("Nutrition")}>
         <Text className={`text-lg font-bold text-center mb-1`}>
           Nutrients from your Previous Meal
@@ -74,9 +74,8 @@ const LastNutritionSummary = () => {
             <Text className="text-xl font-bold mb-2 text-blue-600">
               Protein
             </Text>
-            <Text className="text-lg text-gray-700 mb-2">
-              {protein.toFixed(1)} / 90g
-            </Text>
+            <Text className="text-lg text-gray-700 ">{protein.toFixed(1)}</Text>
+            <Text className="text-lg text-gray-700 mb-2 ">/ 90g</Text>
             <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
               <View
                 className="h-full rounded-full"
@@ -91,9 +90,8 @@ const LastNutritionSummary = () => {
           {/* Fats */}
           <View className="flex-1 bg-white rounded-lg p-4 mx-1 shadow-md items-center">
             <Text className="text-xl font-bold mb-2 text-pink-600">Fats</Text>
-            <Text className="text-lg text-gray-700 mb-2">
-              {fat.toFixed(1)} / 70g
-            </Text>
+            <Text className="text-lg text-gray-700">{fat.toFixed(1)}</Text>
+            <Text className="text-lg text-gray-700 mb-2">/ 70g</Text>
             <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden ">
               <View
                 className="h-full rounded-full"
@@ -110,9 +108,8 @@ const LastNutritionSummary = () => {
             <Text className="text-xl font-bold mb-2 text-yellow-600">
               Carbs
             </Text>
-            <Text className="text-lg text-gray-700 mb-2">
-              {carbs.toFixed(1)} / 110g
-            </Text>
+            <Text className="text-lg text-gray-700 ">{carbs.toFixed(1)}</Text>
+            <Text className="text-lg text-gray-700 mb-2">/ 110g</Text>
             <View className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
               <View
                 className="h-full rounded-full"

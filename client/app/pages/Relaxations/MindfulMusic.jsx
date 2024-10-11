@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../firebaseConfig";
@@ -19,12 +20,14 @@ const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 
 const MindfulMusic = () => {
   const [musicList, setMusicList] = useState([]);
+  const [filteredMusicList, setFilteredMusicList] = useState([]);
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMusic, setCurrentMusic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const [showRelaxations, setShowRelaxations] = useState(false); // State to control displaying LazyRelaxations
 
   // Helper function to format time (mm:ss)
@@ -44,6 +47,7 @@ const MindfulMusic = () => {
           ...doc.data(),
         }));
         setMusicList(musicData);
+        setFilteredMusicList(musicData); // Set the filtered list to the full list initially
       } catch (error) {
         console.error("Error fetching music data: ", error);
       } finally {
@@ -135,6 +139,18 @@ const MindfulMusic = () => {
     setShowRelaxations(true); // Set the state to show LazyRelaxations
   };
 
+  // Filter music based on the search query
+  useEffect(() => {
+    if (searchQuery === "") {
+      setFilteredMusicList(musicList); // Reset to full list if query is empty
+    } else {
+      const filteredMusic = musicList.filter((music) =>
+        music.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredMusicList(filteredMusic);
+    }
+  }, [searchQuery, musicList]);
+
   // If showRelaxations is true, render the LazyRelaxations component
   if (showRelaxations) {
     return (
@@ -162,6 +178,7 @@ const MindfulMusic = () => {
             </TouchableOpacity>
             <Text className="text-3xl font-bold text-white">Mindful Music</Text>
           </View>
+
           <View className="flex flex-col">
             <Text className="text-xl font-bold mt-4">
               What is Mindful music?
@@ -171,6 +188,14 @@ const MindfulMusic = () => {
               with soothing melodies and gentle rhythms, helping to reduce
               stress and enhance mindfulness.
             </Text>
+            <View className="my-1 mt-2">
+              <TextInput
+                className="p-2 border border-gray-300 rounded-lg"
+                placeholder="Search music by name..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
           </View>
           {loading ? (
             <View className="flex justify-center items-center ">
@@ -179,7 +204,7 @@ const MindfulMusic = () => {
             </View>
           ) : (
             <View className="flex flex-col flex-wrap justify-between">
-              {musicList.map((music) => (
+              {filteredMusicList.map((music) => (
                 <View
                   key={music.id}
                   className="p-4 m-2  bg-gray-100 rounded-lg shadow-lg w-[100%] ml-0"

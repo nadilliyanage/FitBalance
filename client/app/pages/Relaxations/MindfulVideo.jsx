@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  TextInput, // Import TextInput for the search bar
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../firebaseConfig";
@@ -18,12 +19,14 @@ const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 
 const MindfulVideo = () => {
   const [videoList, setVideoList] = useState([]);
+  const [filteredVideos, setFilteredVideos] = useState([]); // Add filteredVideos state
   const [currentVideo, setCurrentVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [showRelaxations, setShowRelaxations] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
   // Create a ref for the video player
   const videoRef = useRef(null);
@@ -38,6 +41,7 @@ const MindfulVideo = () => {
           ...doc.data(),
         }));
         setVideoList(videoData);
+        setFilteredVideos(videoData); // Initialize filteredVideos
       } catch (error) {
         console.error("Error fetching video data: ", error);
       } finally {
@@ -89,6 +93,19 @@ const MindfulVideo = () => {
     }
   };
 
+  // Handle search input changes
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query) {
+      const filtered = videoList.filter((video) =>
+        video.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredVideos(filtered);
+    } else {
+      setFilteredVideos(videoList); // Reset filtered list when query is empty
+    }
+  };
+
   if (showRelaxations) {
     return (
       <Suspense fallback={<ActivityIndicator size="large" color="#6200ee" />}>
@@ -115,8 +132,9 @@ const MindfulVideo = () => {
               Mindful Videos
             </Text>
           </View>
+
           <View className="flex flex-col">
-            <Text className="text-xl font-bold mt-4">
+            <Text className="text-xl font-bold mt-2">
               What is Mindful video?
             </Text>
             <Text className="text-sm font-pregular mx-2 mb-2">
@@ -125,6 +143,17 @@ const MindfulVideo = () => {
               stress and enhance mindfulness.
             </Text>
           </View>
+
+          {/* Search Bar */}
+          <View className="my-1 mt-2">
+            <TextInput
+              className="p-2 border border-gray-300 rounded-lg"
+              placeholder="Search video by name..."
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+          </View>
+
           {loading ? (
             <View className="flex justify-center items-center">
               <ActivityIndicator size="large" color="#6200ee" />
@@ -132,7 +161,7 @@ const MindfulVideo = () => {
             </View>
           ) : (
             <View className="flex flex-col flex-wrap justify-between">
-              {videoList.map((video) => (
+              {filteredVideos.map((video) => (
                 <View
                   key={video.id}
                   className="p-4 m-2 bg-gray-100 rounded-lg shadow-lg w-[100%] ml-0"
