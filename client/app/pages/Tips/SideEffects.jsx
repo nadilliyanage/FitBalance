@@ -18,7 +18,6 @@ export default function SideEffectsScreen({ disease, onBackPress }) {
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length > 0) {
           const diseaseData = querySnapshot.docs[0].data();
-          console.log('Disease data:', diseaseData);
           setMajorSideEffects(diseaseData.majorSideEffects || []);
           setMinorSideEffects(diseaseData.minorSideEffects || []);
         } else {

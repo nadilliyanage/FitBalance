@@ -34,7 +34,7 @@ const BMIDetails = () => {
 
   if (!bmiResult) {
     return (
-      <View className="bg-white flex-1 justify-center items-center my-4 mr-4 ml-2 rounded-lg">
+      <View className="bg-white flex-1 justify-center items-center my-0 ml-2 rounded-lg">
         <TouchableOpacity onPress={() => navigation.navigate("Exercises")}>
           <Text className="text-xl font-bold text-secondary-100 text-center">
             Add Your BMI details to see the summary
@@ -70,7 +70,7 @@ const BMIDetails = () => {
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <View className="flex-1 justify-center items-center bg-white rounded-xl w-fit">
+    <View className="flex-1 justify-center items-center bg-white rounded-xl w-max">
       <TouchableOpacity onPress={() => navigation.navigate("Exercises")}>
         <Text
           className={`text-lg font-bold text-center mt-2 ${bmiStatus.color}`}

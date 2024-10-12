@@ -61,7 +61,7 @@ const NutriCal = () => {
           {/* Food Suggestions Button */}
           <TouchableOpacity
             onPress={() => setShowFSuggetions(true)}
-            className="bg-secondary-300 p-4 rounded-xl mb-6 shadow-md mt-4"
+            className="bg-secondary-100 p-4 rounded-xl shadow-sm shadow-black mb-6 mt-4"
           >
             <Text className="text-white text-center text-lg font-semibold">
               Food Suggestions
@@ -69,10 +69,10 @@ const NutriCal = () => {
           </TouchableOpacity>
 
           {/* Row for Nutrition Calculator and Health Data buttons */}
-          <View className="flex-row justify-between mb-8">
+          <View className="flex-row justify-between">
             <TouchableOpacity
               onPress={() => setShowEnterHealthData(true)}
-              className="bg-secondary-300 h-36 w-40 rounded-xl shadow-md flex items-center justify-center"
+              className="bg-secondary-100 h-36 w-40 rounded-xl shadow-sm shadow-black flex items-center justify-center"
             >
               <Icon name="clipboard" size={30} color="white" />
               <Text className="text-white text-lg text-center mt-1">
@@ -82,7 +82,7 @@ const NutriCal = () => {
 
             <TouchableOpacity
               onPress={() => setShowCalculator(true)}
-              className="bg-secondary-300 h-36 w-40 rounded-xl shadow-md flex items-center justify-center"
+              className="bg-secondary-100 h-36 w-40 rounded-xl shadow-sm shadow-black flex items-center justify-center"
             >
               <Icon name="calculator" size={30} color="white" />
               <Text className="text-white text-lg text-center mt-1">

@@ -19,7 +19,6 @@ export default function TreatmentsScreen({ disease, onBackPress}) {
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length > 0) {
           const diseaseData = querySnapshot.docs[0].data();
-          console.log('Disease data:', diseaseData);
           setTreatments(diseaseData.treatments || []);
         } else {
           console.log('No details found for this disease.');
