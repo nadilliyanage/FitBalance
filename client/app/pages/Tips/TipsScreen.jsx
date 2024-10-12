@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator, Modal } from 'react-native';
+import React, { Suspense, useRef, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Linking, ActivityIndicator, Modal, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from "expo-blur";
 import { Video, ResizeMode } from 'expo-av';
-import SideEffectsScreen from './SideEffects';
 
-const TipsScreen = ({ tips, disease, videoURL, onBackPress }) => {
+const TipsScreen = ({ tips, disease, videoURL, image, onBackPress }) => {
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [videoError, setVideoError] = useState(null);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const videoRef = useRef(null);
   const [sideEffects, setSideEffects] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false); 
 
   const openArticleDetails = (article) => {
     setSelectedArticle(article);
@@ -26,24 +26,25 @@ const TipsScreen = ({ tips, disease, videoURL, onBackPress }) => {
     setIsVideoLoading(false);
   };
 
+  const handlePlayPress = () => {
+    setIsPlaying(true);  // Set play state to true to hide thumbnail
+    videoRef.current.playAsync();  // Play the video
+  };
+
   const handleVideoLoad = () => {
     setIsVideoLoading(false);
     setVideoError(null);
   };
 
-  // if (!tips) {
-  //   return (
-  //     <View className="flex-1 justify-center items-center">
-  //       <ActivityIndicator size="large" color="#0000ff" />
-  //     </View>
-  //   );
-  // }
+  const SideEffectScreen = React.lazy(() => import('./SideEffects'));
 
-  if(sideEffects){
-    return <SideEffectsScreen disease={disease}/>
+  if (sideEffects) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <SideEffectScreen disease={disease} onBackPress={() => setSideEffects(false)} />
+      </Suspense>
+    );
   }
-
-  
 
   return (
     <View className="flex-1 bg-white">
@@ -73,15 +74,24 @@ const TipsScreen = ({ tips, disease, videoURL, onBackPress }) => {
               onPress={() => openArticleDetails(tips.join("\n• "))}
               className="mt-2"
             >
-              <Text className="text-blue-600 underline font-pregular">See More</Text>
+              <Text className="text-blue-600 underline font-pregular">
+                See More
+              </Text>
             </TouchableOpacity>
           )}
         </View>
 
         {videoURL ? (
           <View className="mb-4 p-2 border-2 border-gray-300 rounded-xl bg-white">
-            {isVideoLoading && (
+            {isVideoLoading && !isPlaying && (
               <View className="absolute z-10 w-full h-[200px] justify-center items-center bg-gray-200">
+                {image && (
+                  <Image
+                    source={{ uri: image }}
+                    style={{ width: "100%", height: 200 }}
+                    resizeMode="contain"
+                  />
+                )}
                 <ActivityIndicator size="large" color="#0000ff" />
               </View>
             )}
@@ -89,6 +99,19 @@ const TipsScreen = ({ tips, disease, videoURL, onBackPress }) => {
               <View className="absolute z-10 w-full h-[200px] justify-center items-center bg-gray-200">
                 <Text className="text-red-500 text-center">{videoError}</Text>
               </View>
+            )}
+            {image && !isPlaying && (
+              <TouchableOpacity
+                onPress={handlePlayPress} // Play video on click
+                className="absolute z-10 w-full h-[200px] justify-center items-center"
+              >
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: "100%", height: 200 }}
+                  resizeMode="contain"
+                />
+                <Text className="text-white text-lg font-pbold">Play</Text>
+              </TouchableOpacity>
             )}
             {console.log("Video URL:", videoURL)}
             <Video
@@ -135,7 +158,9 @@ const TipsScreen = ({ tips, disease, videoURL, onBackPress }) => {
                 <Ionicons name="close-circle-outline" size={32} color="black" />
               </TouchableOpacity>
               <ScrollView className="mt-8">
-                <Text className="text-lg  font-pregular">{selectedArticle}</Text>
+                <Text className="text-lg  font-pregular">
+                  {selectedArticle}
+                </Text>
               </ScrollView>
             </View>
           </View>

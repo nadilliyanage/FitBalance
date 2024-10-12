@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { View, Text, Button, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import ProgressTrackerScreen from './ProgressTracker';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../firebaseConfig';
 
-export default function TreatmentsScreen({ disease, onBackPress }) {
+export default function TreatmentsScreen({ disease, onBackPress}) {
   const [progressTracker,setProgressTracker] = useState(false);
   const [selectedTreatment, setSelectedTreatment] = useState(null);
   const [treatments, setTreatments] = useState([]);
@@ -36,9 +34,19 @@ export default function TreatmentsScreen({ disease, onBackPress }) {
     fetchTreatments();
   }, [disease]);
 
-  if(progressTracker){
-    return <ProgressTrackerScreen />
+  const ProgressTrackerScreen = React.lazy(() => import('./ProgressTracker'));
+
+  if (progressTracker) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <ProgressTrackerScreen onBackPress={() => setProgressTracker(false)} />
+      </Suspense>
+    );
   }
+
+  // if(progressTracker){
+  //   return <ProgressTrackerScreen />
+  // }
 
   const openTreatments = (treatments) =>{
     setSelectedTreatment(treatments)

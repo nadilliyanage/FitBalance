@@ -19,7 +19,7 @@ const SignIn = () => {
     if (email === "" || password === "") {
       Toast.show({
         type: "error",
-        text1: "Error",
+        text1: "All fields are required!",
         text2: "Please fill in all fields",
       });
       return;
@@ -29,12 +29,13 @@ const SignIn = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
+      router.replace("/home");
       Toast.show({
         type: "success",
-        text1: "Success",
-        text2: "Signed in successfully",
+        text1: "Signed in successfully!",
+        text2: "Welcome to FitBalance360",
       });
-      router.replace("/home"); // Adjust the path as needed
     } catch (error) {
       // Check for specific error codes
       if (error.code === "auth/invalid-credential") {

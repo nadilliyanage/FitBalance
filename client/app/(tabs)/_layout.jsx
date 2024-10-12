@@ -57,7 +57,7 @@ const TabsLayout = () => {
         initialRouteName="home" // Set the initial route to home
         screenOptions={{
           tabBarShowLabel: false,
-          tabBarActiveTintColor: "#800080",
+          tabBarActiveTintColor: "#7F00FF",
           tabBarInactiveTintColor: "#FFFFFF",
           tabBarStyle: {
             backgroundColor: "#8B6AE7",

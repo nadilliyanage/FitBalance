@@ -9,12 +9,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import SleepTracker from "../pages/Relaxations/SleepTracker";
 import AlarmToggle from "../pages/Relaxations/AlarmToggle";
 import MindfulMusic from "../pages/Relaxations/MindfulMusic";
+import MindfulVideo from "../pages/Relaxations/MindfulVideo";
 import Recommendations from "../pages/Relaxations/Recommendations";
 import { useNavigation } from "@react-navigation/native"; // React Navigation
+import WeeklySleepGraph from "../pages/Relaxations/WeeklySleepGraph";
 
 const Relaxations = () => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [showMusic, setShowMusic] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const navigation = useNavigation(); // Navigation hook
 
@@ -24,6 +27,9 @@ const Relaxations = () => {
   if (showMusic) {
     return <MindfulMusic />;
   }
+  if (showVideo) {
+    return <MindfulVideo />;
+  }
   if (showRecommendations) {
     return <Recommendations />;
   }
@@ -31,7 +37,7 @@ const Relaxations = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
-        <View className="flex absolute w-full h-[20%] bg-secondary-100 rounded-b-2xl"></View>
+        <View className="flex absolute w-full h-36 bg-secondary-100 rounded-b-2xl"></View>
         <View>
           <Text className="font-bold text-3xl text-center mt-6 text-white">
             Sleep & Relaxations
@@ -45,11 +51,7 @@ const Relaxations = () => {
             handlePress={() => setShowQuiz(true)}
             containerStyles="w-full mb-2 p-10"
           />
-          <CustomButton
-            title="Recommendations"
-            handlePress={() => setShowRecommendations(true)}
-            containerStyles="w-full mb-2 "
-          />
+
           <View className="flex flex-row">
             <CustomHalfButton
               minititle="Mindful "
@@ -60,11 +62,11 @@ const Relaxations = () => {
             <CustomHalfButton
               minititle="Mindful "
               title="Videos"
-              handlePress={() => setShowMusic(true)}
+              handlePress={() => setShowVideo(true)}
               containerStyles=" m-1 p-6"
             />
           </View>
-          <SleepButton
+          {/* <SleepButton
             title="Sleep Analysis"
             handlePress={() => console.log("Button Pressed")}
             containerStyles="w-full p-10 mt-2"
@@ -72,8 +74,14 @@ const Relaxations = () => {
             isLoading={false}
             imageSource={require("../../assets/images/sleep.png")} // Add your image here
             imageStyle={{ width: 300, height: 300 }} // Adjust the image size
+          /> */}
+          <SleepTracker />
+          <CustomButton
+            title="Recommendations"
+            handlePress={() => setShowRecommendations(true)}
+            containerStyles="w-full my-2 "
           />
-          {/* <SleepTracker /> */}
+          {/* <WeeklySleepGraph /> */}
           <AlarmToggle />
           {/* Add Mindful Music Button */}
         </View>
