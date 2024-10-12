@@ -1,9 +1,9 @@
 import { View, Image, Text, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FormField from "../../components/FormField"; // Your custom form field component
-import CustomButton from "../../components/CustomButton"; // Your custom button component
-import { images } from "../../constants"; // Path to your images
+import FormField from "../../components/FormField";
+import CustomButton from "../../components/CustomButton"; 
+import { images } from "../../constants";
 import { Link, useRouter } from "expo-router";
 import { auth } from "../../firebaseConfig"; // Import auth from firebaseConfig
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -37,7 +37,7 @@ const SignIn = () => {
         text2: "Welcome Back to FitBalance360",
       });
     } catch (error) {
-      // Check for specific error codes
+      
       if (error.code === "auth/invalid-credential") {
         Toast.show({
           type: "error",

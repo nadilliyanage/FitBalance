@@ -1,8 +1,7 @@
-// WeeklySleepGraph.jsx
 import React, { useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions, SafeAreaView, Text, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 import { useNavigation } from "@react-navigation/native";
 
 const screenWidth = Dimensions.get("window").width;

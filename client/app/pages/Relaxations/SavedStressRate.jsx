@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Svg, Circle } from "react-native-svg"; // Importing Svg and Circle from react-native-svg
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
+import { Svg, Circle } from "react-native-svg"; 
+import { useNavigation } from "@react-navigation/native";
 
 const SavedStressRate = () => {
   const navigation = useNavigation(); // Get navigation object from hook

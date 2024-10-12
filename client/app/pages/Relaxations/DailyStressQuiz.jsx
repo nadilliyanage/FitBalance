@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Svg, Circle } from "react-native-svg"; // Import Svg and Circle
+import { Svg, Circle } from "react-native-svg"; 
 
 const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 const LazyRecommendations = lazy(() => import("./Recommendations"));

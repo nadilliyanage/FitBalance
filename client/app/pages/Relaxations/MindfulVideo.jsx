@@ -6,27 +6,27 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  TextInput, // Import TextInput for the search bar
+  TextInput, 
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { Video } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
-import Slider from "@react-native-community/slider"; // Import the slider component
+import Slider from "@react-native-community/slider"; 
 
 const LazyRelaxations = lazy(() => import("../../(tabs)/Relaxations"));
 
 const MindfulVideo = () => {
   const [videoList, setVideoList] = useState([]);
-  const [filteredVideos, setFilteredVideos] = useState([]); // Add filteredVideos state
+  const [filteredVideos, setFilteredVideos] = useState([]); 
   const [currentVideo, setCurrentVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackPosition, setPlaybackPosition] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [showRelaxations, setShowRelaxations] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [searchQuery, setSearchQuery] = useState(""); 
 
   // Create a ref for the video player
   const videoRef = useRef(null);

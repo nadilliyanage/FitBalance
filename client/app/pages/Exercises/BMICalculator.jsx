@@ -287,9 +287,9 @@ const BMICalculator = () => {
                         backgroundColor: "black",
                       }}
                     />
-                    {i % 5 === 0 && (
+                    {/* {i % 5 === 0 && (
                       <Text className="mt-2 font-semibold">{i + 100}</Text>
-                    )}
+                    )} */}
                   </View>
                 ))}
               </View>

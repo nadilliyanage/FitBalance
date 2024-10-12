@@ -40,7 +40,7 @@ const Recommendations = () => {
           const parsedStressLevel = JSON.parse(savedStressLevel);
           setAsyncStressLevel(parsedStressLevel);
         } else {
-          console.warn("No stress level found in AsyncStorage");
+          
         }
       } catch (error) {
         console.error("Failed to load stress level from AsyncStorage", error);
@@ -266,7 +266,7 @@ const Recommendations = () => {
             )}
           />
         ) : (
-          <Text className="text-lg text-center">No media data available.</Text>
+          <Text className="text-lg text-center">Do the Daily Quiz to see Premium Recommendations</Text>
         )}
       </View>
 
