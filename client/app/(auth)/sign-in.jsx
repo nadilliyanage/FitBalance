@@ -34,7 +34,7 @@ const SignIn = () => {
       Toast.show({
         type: "success",
         text1: "Signed in successfully!",
-        text2: "Welcome to FitBalance360",
+        text2: "Welcome Back to FitBalance360",
       });
     } catch (error) {
       // Check for specific error codes
