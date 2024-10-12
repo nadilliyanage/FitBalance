@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { db } from '../../../firebaseConfig';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import TreatmentsScreen from './Treatment';
 
 export default function SideEffectsScreen({ disease, onBackPress }) {
   const [loading, setLoading] = useState(true);
@@ -19,7 +18,6 @@ export default function SideEffectsScreen({ disease, onBackPress }) {
         const querySnapshot = await getDocs(q);
         if (querySnapshot.docs.length > 0) {
           const diseaseData = querySnapshot.docs[0].data();
-          console.log('Disease data:', diseaseData);
           setMajorSideEffects(diseaseData.majorSideEffects || []);
           setMinorSideEffects(diseaseData.minorSideEffects || []);
         } else {
@@ -35,8 +33,14 @@ export default function SideEffectsScreen({ disease, onBackPress }) {
     fetchSideEffects();
   }, [disease]);
 
+  const TreatmentScreen = React.lazy(() => import('./Treatment'));
+
   if (showTreatment) {
-    return <TreatmentsScreen disease={disease} onBackPress={() => setShowTreatment(false)} />;
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <TreatmentScreen disease={disease} onBackPress={() => setShowTreatment(false)} />
+      </Suspense>
+    );
   }
 
   return (

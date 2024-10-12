@@ -121,7 +121,6 @@ const HealthData = () => {
               setHdlRange("");
               setLdlRange("");
               setTriglyceridesRange("");
-              console.log("Health data deleted successfully");
             } catch (error) {
               console.error("Failed to delete health data", error);
             }

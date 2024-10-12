@@ -1,15 +1,19 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
-import TipsForm from '../pages/Tips/TipsForm';
+import React, { Suspense, useState } from 'react';
 
 const Tips = () => {
   const [tipsForm, setTipsForm] = useState(false);
   const [seeMore,setSeeMore] = useState(false);
 
-  if (tipsForm) {
-    return <TipsForm />;
-  }
+  const TipsFormScreen = React.lazy(() => import('../pages/Tips/TipsForm'));
 
+  if (tipsForm) {
+    return (
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <TipsFormScreen onBackPress={() => setTipsForm(false)} />
+      </Suspense>
+    );
+  }
   return (
     <View className="p-4 font-pbold bg-white flex-1">
       <Text className="text-4xl font-pbold text-center mb-4 text-black mt-16">
