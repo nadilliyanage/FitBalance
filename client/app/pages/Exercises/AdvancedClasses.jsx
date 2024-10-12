@@ -10,7 +10,7 @@ const AdvancedClasses = ({ filterText = "", searchBy = "Name" }) => {
   const [countdownInterval, setCountdownInterval] = useState(null);
   const [duration, setDuration] = useState(0); 
 
-  const filteredClasses = classes.Beginner.filter((classItem) => {
+  const filteredClasses = classes.Advanced.filter((classItem) => {
     const searchKey = searchBy === "Name" ? "Name" : "instructor";
     const searchValue = classItem[searchKey] || "";
 
