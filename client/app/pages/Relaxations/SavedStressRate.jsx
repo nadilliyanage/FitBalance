@@ -48,7 +48,7 @@ const SavedStressRate = () => {
 
   if (!stressData) {
     return (
-      <View className="p-4 bg-white rounded-lg shadow-md items-center my-4 ml-4">
+      <View className="p-4 bg-white rounded-lg shadow-md items-center my-0">
         <TouchableOpacity onPress={() => navigation.navigate("Relaxations")}>
           <Text className="text-xl font-bold text-secondary-100 text-center">
             Do the Daily Quiz to see Stress Rate
@@ -67,7 +67,7 @@ const SavedStressRate = () => {
   const strokeDashoffset = circumference - percentage * circumference;
 
   return (
-    <View className="p-4 bg-white rounded-lg shadow-md items-center">
+    <View className="p-4 bg-white rounded-lg shadow-md items-center w-max ml-2">
       <TouchableOpacity onPress={() => navigation.navigate("Relaxations")}>
         <View className="items-center">
           <Text className={`text-lg font-bold`}>Stress Level</Text>
@@ -101,7 +101,7 @@ const SavedStressRate = () => {
               {Math.round(stressData.progress * 100)}%
             </Text>
           </View>
-          <Text className={`text-lg ${getStressColor(stressData.level)}`}>
+          <Text className={`text-lg font-bold ${getStressColor(stressData.level)}`}>
             {stressData.level}
           </Text>
         </View>

@@ -1,12 +1,12 @@
 import React, { useCallback } from "react";
 import { View, Image, Text, BackHandler } from "react-native";
 import { Tabs, useNavigation } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native"; // Import this
+import { useFocusEffect } from "@react-navigation/native";
 import { icons } from "../../constants";
 
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
-    <View className="items-center justify-center gap-2 ">
+    <View className="items-center justify-center gap-2 w-20">
       <Image
         source={icon}
         resizeMode="contain"
@@ -29,23 +29,17 @@ const TabsLayout = () => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        // Get the current route
         const currentRoute =
           navigation.getState().routes[navigation.getState().index].name;
 
         if (currentRoute !== "home") {
-          // Navigate to the "home" tab if not already on it
           navigation.navigate("home");
-          return true; // Prevent the default back button behavior
+          return true;
         }
-        // Exit the app if already on the home tab (you can customize this logic)
-        return false; // Let the default back button behavior (exit app)
+        return false;
       };
 
-      // Add the event listener
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
-      // Cleanup the event listener when the component unmounts
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }, [navigation])
@@ -54,32 +48,71 @@ const TabsLayout = () => {
   return (
     <>
       <Tabs
-        initialRouteName="home" // Set the initial route to home
-        screenOptions={{
+        initialRouteName="home"
+        screenOptions={({ route }) => ({
           tabBarShowLabel: false,
           tabBarActiveTintColor: "#7F00FF",
           tabBarInactiveTintColor: "#FFFFFF",
           tabBarStyle: {
             backgroundColor: "#8B6AE7",
             borderTopWidth: 1,
-            borderTopColor: "#232533",
             height: 80,
           },
-        }}
+          tabBarIconStyle: {
+            borderRadius: route.name === "home" ? 20 : 0, // Conditional rounded corners for home
+          },
+          tabBarIcon: ({ color, focused }) => {
+            let icon;
+            let name;
+
+            switch (route.name) {
+              case "Exercises":
+                icon = icons.exercises;
+                name = "Exercises";
+                break;
+              case "Relaxations":
+                icon = icons.relaxations;
+                name = "Relax";
+                break;
+              case "home":
+                icon = icons.home;
+                name = "Home";
+                break;
+              case "Nutrition":
+                icon = icons.nutrition;
+                name = "Nutrition";
+                break;
+              case "tips":
+                icon = icons.tips;
+                name = "Tips";
+                break;
+              default:
+                icon = icons.home;
+                name = "Home";
+            }
+
+            return (
+              <View
+                className={`${
+                  focused ? "bg-white rounded-lg p-2" : ""
+                } items-center justify-center gap-2`}
+              >
+                <TabIcon
+                  icon={icon}
+                  color={color}
+                  name={name}
+                  focused={focused}
+                />
+              </View>
+            );
+          },
+        })}
       >
         <Tabs.Screen
           name="Exercises"
           options={{
             title: "Exercises",
             headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.exercises}
-                color={color}
-                name="Exercises"
-                focused={focused}
-              />
-            ),
           }}
         />
         <Tabs.Screen
@@ -87,14 +120,6 @@ const TabsLayout = () => {
           options={{
             title: "Relaxations",
             headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.relaxations}
-                color={color}
-                name="Relaxations"
-                focused={focused}
-              />
-            ),
           }}
         />
 
@@ -103,14 +128,6 @@ const TabsLayout = () => {
           options={{
             title: "Home",
             headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.home}
-                color={color}
-                name="Home"
-                focused={focused}
-              />
-            ),
           }}
         />
 
@@ -119,14 +136,6 @@ const TabsLayout = () => {
           options={{
             title: "Nutrition",
             headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.nutrition}
-                color={color}
-                name="Nutrition"
-                focused={focused}
-              />
-            ),
           }}
         />
 
@@ -135,14 +144,6 @@ const TabsLayout = () => {
           options={{
             title: "Tips",
             headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon
-                icon={icons.tips}
-                color={color}
-                name="Tips"
-                focused={focused}
-              />
-            ),
           }}
         />
       </Tabs>

@@ -69,11 +69,11 @@ const ExerciseMainPage = ({ onBMIClick }) => {
   };
 
   return (
-  
     <View className="flex-1 px-5 pt-10 bg-white">
-      
       <View className="items-center">
-        <Text className="text-3xl font-bold text-center text-black">Exercises</Text>
+        <Text className="text-3xl font-bold text-center text-black">
+          Exercises
+        </Text>
 
         {!hasBMIResult && (
           <CustomButton
@@ -184,7 +184,6 @@ const ExerciseMainPage = ({ onBMIClick }) => {
 
       {/* Fixed search field and dropdown */}
       <View className="flex-row items-center mt-5 mb-2">
-        
         <View className="w-[170px]">
           <Picker
             selectedValue={searchBy}

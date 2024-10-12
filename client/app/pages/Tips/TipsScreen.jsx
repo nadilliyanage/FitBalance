@@ -113,7 +113,6 @@ const TipsScreen = ({ tips, disease, videoURL, image, onBackPress }) => {
                 <Text className="text-white text-lg font-pbold">Play</Text>
               </TouchableOpacity>
             )}
-            {console.log("Video URL:", videoURL)}
             <Video
               ref={videoRef}
               source={{ uri: videoURL }}

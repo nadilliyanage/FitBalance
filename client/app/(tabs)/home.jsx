@@ -85,7 +85,7 @@ const Home = () => {
         ListHeaderComponent={() => (
           <View>
             <Last />
-            <View className="flex flex-row items-center justify-center mt-2 gap-2">
+            <View className="flex flex-row items-center justify-center px-4 mx-2 gap-2">
               <View className="flex-1">
                 <SavedStressRate />
               </View>
@@ -94,10 +94,13 @@ const Home = () => {
                 <BMIGraph />
               </View>
             </View>
-            <View className="m-2">
+            <View className="my-2 px-4">
               <ClassTracker />
             </View>
+            <View className="my-2 px-4">
             <WeeklySleepGraph />
+            </View>
+            
           </View>
         )}
         renderItem={null} // No dynamic items, only header components

@@ -60,7 +60,6 @@ const TipsForm = ({ onBackPress }) => {
 
       if (querySnapshot.docs.length > 0) {
         const diseaseData = querySnapshot.docs[0].data();
-        console.log('Disease data:', diseaseData);
         setDiseaseData(diseaseData); // Set the disease data from Firestore
         setTipsScreen(true); // Navigate to the TipsScreen
       } else {
